@@ -3,7 +3,7 @@ Tests for CAPL Scanner functionality
 """
 import pytest
 from pathlib import Path
-from capl_tools_lib.core import CaplFileManager
+from capl_tools_lib.file_manager import CaplFileManager
 from capl_tools_lib.scanner import CaplScanner
 from capl_tools_lib.elements import (
     CaplInclude, 

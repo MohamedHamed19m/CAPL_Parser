@@ -1,7 +1,7 @@
 import re
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Optional, Type
-from capl_tools_lib.core import CaplFileManager
+from capl_tools_lib.file_manager import CaplFileManager
 from capl_tools_lib.elements import CAPLElement, TestCase, Handler, Function, TestFunction, CaplInclude, CaplVariable
 from capl_tools_lib.common import get_logger
 

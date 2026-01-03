@@ -22,7 +22,7 @@ build-backend = "hatchling.build"
 
 
 [project.scripts]
-capl_tools = "capl_tools_lib.api:main" # This creates the 'capl_tools' command
+capl_tools = "capl_tools_lib.cli:main" # This creates the 'capl_tools' command
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -30,8 +30,9 @@ pip install -e .
 ```
 CAPL_Parser/
 ├── src/capl_tools_lib/
-│   ├── api.py          # Public API interface
-│   ├── core.py         # Core parsing logic
+│   ├── cli.py          # Command Line Interface logic
+│   ├── file_manager.py # File I/O and persistence
+│   ├── processor.py    # High-level orchestration (Facade)
 │   ├── editor.py       # Code manipulation utilities
 │   ├── elements.py     # CAPL AST element definitions
 │   ├── scanner.py      # Lexical analysis
@@ -54,15 +55,16 @@ The library includes a powerful Command Line Interface (CLI) powered by **Typer*
 uv run capl_tools --help
 
 # Scan a file and show table of elements
-uv run capl_-_tools scan tests/data/sample.can
+uv run capl_tools scan tests/data/sample.can
 
 # Scan and show only summary counts
-uv run capl_-_tools scan tests/data/sample.can --summary
+uv run capl_tools scan tests/data/sample.can --summary
 ```
 
 ### Available Commands
 
 - `scan`: List all detected elements (TestCases, Functions, etc.)
+- `remove-group`: Remove all test cases belonging to a specific test group.
 - `validate`: (Stub) Check CAPL syntax and semantics
 - `transform`: (Stub) Modify CAPL code programmatically
 
@@ -72,18 +74,14 @@ uv run capl_-_tools scan tests/data/sample.can --summary
 
 ```python
 from pathlib import Path
-from capl_tools_lib.core import CaplFileManager
-from capl_tools_lib.scanner import CaplScanner
+from capl_tools_lib.processor import CaplProcessor
 
-# 1. Initialize File Manager
+# 1. Initialize Processor
 file_path = Path("tests/data/sample.can")
-file_manager = CaplFileManager(file_path)
+processor = CaplProcessor(file_path)
 
-# 2. Initialize Scanner
-scanner = CaplScanner(file_manager)
-
-# 3. Scan for elements
-elements = scanner.scan_all()
+# 2. Scan for elements
+elements = processor.scan()
 
 from capl_tools_lib.elements import TestCase
 
@@ -94,13 +92,14 @@ for el in elements:
 
 ## Architecture
 
-**Scanner** → **Parser** → **AST** → **Editor/Transformer** → **Output**
+**CLI** → **Processor** → (**Scanner**, **Editor**, **FileManager**)
 
-- `scanner.py` – Extracts CAPL elements and metadata using specialized strategies.
-- `core.py` – Handles file I/O and low-level line management.
-- `elements.py` – Defines the AST (Abstract Syntax Tree) elements and their attributes.
-- `editor.py` – Provides non-destructive editing and transformation capabilities.
-- `api.py` – Exposes the library's functionality through a high-level public interface.
+- `cli.py` – Entry point for terminal commands.
+- `processor.py` – Orchestrates scanning, editing, and file management.
+- `file_manager.py` – Handles file reading, writing, and backups.
+- `scanner.py` – Extracts CAPL elements.
+- `editor.py` – Manages in-memory string manipulation.
+- `elements.py` – Defines the AST elements.
 
 
 ## Logging

@@ -8,8 +8,7 @@ from rich.table import Table
 from rich.panel import Panel
 
 # Import your internal logic
-from capl_tools_lib.core import CaplFileManager
-from capl_tools_lib.scanner import CaplScanner
+from capl_tools_lib.processor import CaplProcessor
 
 app = typer.Typer(
     name="capl_tools",
@@ -29,10 +28,9 @@ def scan(
         typer.secho(f"Error: File {path} not found.", fg=typer.colors.RED)
         raise typer.Exit(code=1)
 
-    console      = Console()
-    file_manager = CaplFileManager(path)
-    scanner      = CaplScanner(file_manager)
-    elements     = scanner.scan_all()
+    console = Console()
+    processor = CaplProcessor(path)
+    elements = processor.scan()
     typer.echo(f"Found {len(elements)} elements in {path.name}:")
 
     
@@ -71,6 +69,28 @@ def scan(
         )
 
     console.print(table)
+
+@app.command()
+def remove_group(
+    path: Annotated[Path, typer.Argument(help="Path to the .can file")],
+    group: Annotated[str, typer.Argument(help="Name of the test group to remove")]
+):
+    """
+    Remove all test cases belonging to a specific test group.
+    """
+    if not path.exists():
+        typer.secho(f"Error: File {path} not found.", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+    processor = CaplProcessor(path)
+    count = processor.remove_test_group(group)
+    
+    if count > 0:
+        processor.save()
+        typer.secho(f"Successfully removed {count} test cases from group '{group}' in {path.name}.", fg=typer.colors.GREEN)
+    else:
+        typer.secho(f"No test cases found in group '{group}'.", fg=typer.colors.YELLOW)
+        
 @app.command()
 def validate(path: Path):
     """

@@ -1,4 +1,5 @@
 import re
+import shutil
 from pathlib import Path
 from capl_tools_lib.common import get_logger
 TEST_STATUS_PASS = 1
@@ -49,6 +50,20 @@ class CaplFileManager:
         except Exception as e:
             logger.error(f"Error writing to {output_path}: {e}")
             raise IOError(f"Could not write to file {output_path}: {e}")
+
+    def save_file(self, target_path: Path, lines: list[str], backup: bool = True) -> None:
+        """
+        Saves lines to the target path, optionally creating a backup if overwriting.
+        """
+        if backup and target_path.exists():
+            backup_path = target_path.with_suffix(target_path.suffix + ".bak")
+            try:
+                shutil.copy2(target_path, backup_path)
+                logger.info(f"Created backup at {backup_path}")
+            except Exception as e:
+                logger.warning(f"Failed to create backup: {e}")
+
+        self.write_lines(target_path, lines)
         
     def strip_comments(self) -> list[str]:
         """ Return lines with // comments stripped out. """

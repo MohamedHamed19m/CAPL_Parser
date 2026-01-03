@@ -1,10 +1,9 @@
-import shutil
 from pathlib import Path
 from typing import List, Dict, Optional
 
 # Update these to include the package name
 from capl_tools_lib.common import get_logger
-from capl_tools_lib.core import CaplFileManager
+from capl_tools_lib.file_manager import CaplFileManager
 from capl_tools_lib.elements import CAPLElement, TestCase
 logger = get_logger(__name__)
 
@@ -18,6 +17,10 @@ class CaplEditor:
         self._current_lines : List[str] = list(file_mngr.lines)  # Make a copy to work on
         logger.debug(f"CaplEditor initialized for {file_mngr.file_path}")
 
+    def get_lines(self) -> List[str]:
+        """ Returns the current state of the modified lines. """
+        return self._current_lines
+    
     def _get_modified_lines(self) -> List[str]:
         return self._current_lines
     
@@ -75,3 +78,8 @@ class CaplEditor:
             element_lines: Lines of code for the element
         """
         self.insert_lines(position, element_lines)
+
+    def reset(self) -> None:
+        """Resets all changes, reverting to the original file content."""
+        self._current_lines = list(self.file_mngr.lines)
+        logger.info("Reset editor content to original state")
