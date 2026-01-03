@@ -1,4 +1,4 @@
-import logging
+import re
 from pathlib import Path
 from common import get_logger
 TEST_STATUS_PASS = 1
@@ -34,5 +34,28 @@ class CaplFileManager:
             raise ValueError(f"Invalid line range: {start} to {end}")
         
         logger.debug(f"Retrieving lines {start} to {end} from {self.file_path}")
-        
+
         return self.lines[start:end]
+    
+    def write_lines(self, output_path: Path, lines: list[str]):
+        if not output_path.parent.exists():
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            logger.debug(f"Created directories for {output_path.parent}")
+
+        try:
+            with output_path.open('w', encoding='cp1252') as f:
+                f.writelines(lines)
+                logger.info(f"Successfully wrote {len(lines)} lines to {output_path}")
+        except Exception as e:
+            logger.error(f"Error writing to {output_path}: {e}")
+            raise IOError(f"Could not write to file {output_path}: {e}")
+        
+    def strip_comments(self) -> list[str]:
+        """ Return lines with // comments stripped out. """
+        stripped_lines = []
+        for line in self.lines:
+            stripped_line = re.sub(r'//.*','', line).strip()
+            if stripped_line:
+                stripped_lines.append(stripped_line)
+        logger.debug(f"stripped {len(self.lines) - len(stripped_lines)} comments from {self.file_path}")
+        return stripped_lines
