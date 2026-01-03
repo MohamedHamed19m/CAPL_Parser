@@ -80,11 +80,41 @@ logger.warning("Something might be wrong")
 
 - Python 3.11+
 
-## Development
+## Development with uv
 
-Development script:
-```bash
-python tests/dev_script.py
+This project uses `uv` for lightning-fast Python package and environment management.
+
+### 1. Initialize and Sync the Environment
+Run this in your root directory (`CAPL_Parser`). This command will create the `uv.lock` file and the `.venv` folder.
+
+```powershell
+# This reads your pyproject.toml and sets up the virtual environment
+uv sync
+```
+
+### 2. Run Development Scripts
+`uv run` ensures the environment is up to date before executing the script.
+
+```powershell
+# Run the demo logging script
+uv run tests/demo_logging.py
+
+# Run the dev script
+uv run tests/dev_script.py
+```
+
+### 3. Adding Dependencies
+If you need libraries for your parser (like `lark`, `ply`, or `regex`), add them using:
+
+```powershell
+uv add lark
+```
+
+### 4. How to use your package in scripts
+Because the project uses a `src` layout with `package = true`, `uv` installs the package in editable mode by default. In your scripts, you can simply write:
+
+```python
+from capl_tools_lib import core
 ```
 
 ## Contributing

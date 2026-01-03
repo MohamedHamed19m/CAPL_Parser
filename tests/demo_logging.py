@@ -1,9 +1,6 @@
 import sys
 import os
 
-# Add src to path so we can import the library
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
-
 import logging
 from capl_tools_lib.common import get_logger, MODULE_CONFIG
 
