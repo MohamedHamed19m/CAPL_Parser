@@ -27,7 +27,7 @@ pip install -e .
 ## Project Structure
 
 ```
-capl-forge/
+CAPL_Parser/
 ├── src/capl_tools_lib/
 │   ├── api.py          # Public API interface
 │   ├── core.py         # Core parsing logic
@@ -40,6 +40,29 @@ capl-forge/
 │   └── data/
 │       └── sample.can  # Sample CAPL file
 └── README.md
+```
+
+## Library Usage
+
+### Scanning a File
+
+```python
+from pathlib import Path
+from capl_tools_lib.core import CaplFileManager
+from capl_tools_lib.scanner import CaplScanner
+
+# 1. Initialize File Manager
+file_path = Path("tests/data/sample.can")
+file_manager = CaplFileManager(file_path)
+
+# 2. Initialize Scanner
+scanner = CaplScanner(file_manager)
+
+# 3. Scan for elements
+elements = scanner.scan_all()
+
+for el in elements:
+    print(f"{el.__class__.__name__}: {el.name} (Lines {el.start_line}-{el.end_line})")
 ```
 
 ## Architecture
