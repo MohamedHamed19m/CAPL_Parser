@@ -5,6 +5,7 @@ A powerful command-line tool for parsing, analyzing, and manipulating CAPL (CAN 
 ## Features
 
 - **Parse CAPL Files** – Extract and analyze CAPL code structure
+- **Test Group Detection** – Identify and organize test cases into logical groups (e.g., via `InitializeTestGroup`)
 - **Manipulate & Transform** – Modify CAPL code programmatically
 - **AST Operations** – Work with abstract syntax trees
 - **Validation** – Check CAPL syntax and semantics
@@ -61,19 +62,22 @@ scanner = CaplScanner(file_manager)
 # 3. Scan for elements
 elements = scanner.scan_all()
 
+from capl_tools_lib.elements import TestCase
+
 for el in elements:
-    print(f"{el.__class__.__name__}: {el.name} (Lines {el.start_line}-{el.end_line})")
+    detail = f" (Group: {el.group_name})" if isinstance(el, TestCase) else ""
+    print(f"{el.__class__.__name__}: {el.name}{detail} (Lines {el.start_line}-{el.end_line})")
 ```
 
 ## Architecture
 
 **Scanner** → **Parser** → **AST** → **Editor/Transformer** → **Output**
 
-- `scanner.py` – extract 
-- `core.py` – Parses 
-- `elements.py` – Defines 
-- `editor.py` – Provides 
-- `api.py` – Exposes 
+- `scanner.py` – Extracts CAPL elements and metadata using specialized strategies.
+- `core.py` – Handles file I/O and low-level line management.
+- `elements.py` – Defines the AST (Abstract Syntax Tree) elements and their attributes.
+- `editor.py` – Provides non-destructive editing and transformation capabilities.
+- `api.py` – Exposes the library's functionality through a high-level public interface.
 
 
 ## Logging
@@ -119,11 +123,11 @@ uv sync
 `uv run` ensures the environment is up to date before executing the script.
 
 ```powershell
-# Run the demo logging script
-uv run tests/demo_logging.py
+# Run the scanner demo
+uv run tests/dev_code.py
 
-# Run the dev script
-uv run tests/dev_script.py
+# Run the group detection tests
+uv run pytest tests/test_group_scanning.py
 ```
 
 ### 3. Adding Dependencies
