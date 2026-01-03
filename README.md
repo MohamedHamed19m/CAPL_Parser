@@ -32,7 +32,23 @@ pip install capl-tools-lib
 ```
 
 ## Project Structure
-... (existing content) ...
+
+```
+CAPL_Parser/
+├── src/capl_tools_lib/
+│   ├── cli.py          # Command Line Interface logic
+│   ├── file_manager.py # File I/O and persistence
+│   ├── processor.py    # High-level orchestration (Facade)
+│   ├── editor.py       # Code manipulation utilities
+│   ├── elements.py     # CAPL AST element definitions
+│   ├── scanner.py      # Lexical analysis
+│   └── common.py       # Shared utilities
+├── tests/
+│   ├── dev_script.py   # Development testing
+│   └── data/
+│       └── sample.can  # Sample CAPL file
+└── README.md
+```
 
 ## CLI Usage
 
@@ -58,7 +74,6 @@ capl_tools remove-group path/to/your_file.can "MyTestGroup"
 > `uvx capl-tools-lib scan sample.can`
 
 ### Available Commands
-... (existing content) ...
 
 - `scan`: List all detected elements (TestCases, Functions, etc.)
 - `remove-group`: Remove all test cases belonging to a specific test group.
