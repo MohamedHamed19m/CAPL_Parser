@@ -1,5 +1,33 @@
 # CAPL Tools Library Documentation
 
+## CLI Documentation (api.py)
+
+### Overview
+The `api.py` module provides a Command Line Interface (CLI) for the library using `Typer`. It serves as the main entry point for users interacting with the tool via the terminal.
+
+### Configuration
+The CLI is registered in `pyproject.toml` under `[project.scripts]`:
+```toml
+[project.scripts]
+capl-tools = "capl_tools_lib.api:main"
+```
+
+### Commands
+
+#### `scan`
+Scans a CAPL file and displays detected elements.
+- **Arguments**: `path` (Path to .can file)
+- **Options**: `--summary` / `-s` (Show counts only)
+- **Output**: Uses `rich` to display a formatted table or summary list.
+
+#### `validate` (Stub)
+Intended for syntax and semantic validation.
+
+#### `transform` (Stub)
+Intended for applying programmatic transformations to the code.
+
+---
+
 ## CaplScanner Class
 
 ### Overview

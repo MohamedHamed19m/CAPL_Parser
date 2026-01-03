@@ -43,6 +43,29 @@ CAPL_Parser/
 └── README.md
 ```
 
+## CLI Usage
+
+The library includes a powerful Command Line Interface (CLI) powered by **Typer**.
+
+### Basic Commands
+
+```bash
+# Show help
+uv run capl-tools --help
+
+# Scan a file and show table of elements
+uv run capl-tools scan tests/data/sample.can
+
+# Scan and show only summary counts
+uv run capl-tools scan tests/data/sample.can --summary
+```
+
+### Available Commands
+
+- `scan`: List all detected elements (TestCases, Functions, etc.)
+- `validate`: (Stub) Check CAPL syntax and semantics
+- `transform`: (Stub) Modify CAPL code programmatically
+
 ## Library Usage
 
 ### Scanning a File

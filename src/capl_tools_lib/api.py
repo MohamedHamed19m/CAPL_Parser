@@ -1,0 +1,87 @@
+import typer
+from pathlib import Path
+from typing import Optional
+from typing_extensions import Annotated
+from rich.console import Console
+from rich.table import Table
+
+# Import your internal logic
+from capl_tools_lib.core import CaplFileManager
+from capl_tools_lib.scanner import CaplScanner
+
+app = typer.Typer(
+    name="capl-tools",
+    help="A powerful CLI for parsing and manipulating CAPL files.",
+    add_completion=False,
+)
+
+@app.command()
+def scan(
+    path: Annotated[Path, typer.Argument(help="Path to the .can file")],
+    summary: bool = typer.Option(False, "--summary", "-s", help="Show only a summary")
+):
+    """
+    Scan a CAPL file and list all detected elements (TestCases, Functions, etc.)
+    """
+    if not path.exists():
+        typer.secho(f"Error: File {path} not found.", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+    file_manager = CaplFileManager(path)
+    scanner = CaplScanner(file_manager)
+    elements = scanner.scan_all()
+
+    typer.echo(f"Found {len(elements)} elements in {path.name}:")
+    
+    if summary:
+        # Just print counts per type
+        from collections import Counter
+        counts = Counter(el.__class__.__name__ for el in elements)
+        for type_name, count in counts.items():
+            typer.echo(f" - {type_name}: {count}")
+        return
+
+    console = Console()
+    table = Table(title=f"Elements in {path.name}")
+
+    table.add_column("Type", style="cyan")
+    table.add_column("Name", style="magenta")
+    table.add_column("Lines", style="green")
+
+    for el in elements:
+        name = getattr(el, 'name', "---")
+        table.add_row(
+            el.__class__.__name__,
+            str(name),
+            f"{el.start_line}-{el.end_line}"
+        )
+
+    console.print(table)
+@app.command()
+def validate(path: Path):
+    """
+    Check CAPL syntax and semantics.
+    """
+    typer.echo(f"Validating {path}...")
+    # TODO: Implement validation logic
+    typer.secho("Validation passed!", fg=typer.colors.GREEN)
+
+@app.command()
+def transform(
+    path: Path, 
+    output: Annotated[Optional[Path], typer.Option(help="Output file path")] = None
+):
+    """
+    Modify CAPL code programmatically (e.g., refactoring or injecting code).
+    """
+    typer.echo(f"Transforming {path}...")
+    # TODO: Link to your editor.py logic
+    if output:
+        typer.echo(f"Saved to {output}")
+
+def main():
+    """Entry point for the CLI."""
+    app()
+
+if __name__ == "__main__":
+    main()

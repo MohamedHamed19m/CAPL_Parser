@@ -7,7 +7,10 @@ authors = [
     { name = "Mohamed Hamed Othman", email = "mohamedahamed1915@gmail.com" }
 ]
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "typer[all]>=0.12.0", # Added Typer for CLI
+    "rich>=13.0.0",       # Optional: for beautiful CLI output
+]
 
 [tool.uv]
 package = true
@@ -15,6 +18,11 @@ package = true
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+
+
+[project.scripts]
+capl-tools = "capl_tools_lib.api:main" # This creates the 'capl-tools' command
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
