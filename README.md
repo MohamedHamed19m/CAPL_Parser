@@ -13,55 +13,52 @@ A powerful command-line tool for parsing, analyzing, and manipulating CAPL (CAN 
 
 ## Installation
 
+You can run `capl_tools` instantly without installing it using `uvx`:
+
 ```bash
-pip install CAPL_Parser
+uvx capl-tools-lib scan my_file.can
 ```
 
-Or install from source:
+Or install it globally as a tool:
 
 ```bash
-git clone https://github.com/MohamedHamed19m/CAPL_Parser 
-cd CAPL_Parser
-pip install -e .
+uv tool install capl-tools-lib
+```
+
+Alternatively, install via pip:
+
+```bash
+pip install capl-tools-lib
 ```
 
 ## Project Structure
-
-```
-CAPL_Parser/
-├── src/capl_tools_lib/
-│   ├── cli.py          # Command Line Interface logic
-│   ├── file_manager.py # File I/O and persistence
-│   ├── processor.py    # High-level orchestration (Facade)
-│   ├── editor.py       # Code manipulation utilities
-│   ├── elements.py     # CAPL AST element definitions
-│   ├── scanner.py      # Lexical analysis
-│   └── common.py       # Shared utilities
-├── tests/
-│   ├── dev_script.py   # Development testing
-│   └── data/
-│       └── sample.can  # Sample CAPL file
-└── README.md
-```
+... (existing content) ...
 
 ## CLI Usage
 
-The library includes a powerful Command Line Interface (CLI) powered by **Typer**.
+Once installed, you can use the `capl_tools` command directly from your terminal.
 
 ### Basic Commands
 
 ```bash
 # Show help
-uv run capl_tools --help
+capl_tools --help
 
 # Scan a file and show table of elements
-uv run capl_tools scan tests/data/sample.can
+capl_tools scan path/to/your_file.can
 
 # Scan and show only summary counts
-uv run capl_tools scan tests/data/sample.can --summary
+capl_tools scan path/to/your_file.can --summary
+
+# Remove a specific test group
+capl_tools remove-group path/to/your_file.can "MyTestGroup"
 ```
 
+> **Tip:** If you don't want to install the package, you can run any command instantly using `uvx`:
+> `uvx capl-tools-lib scan sample.can`
+
 ### Available Commands
+... (existing content) ...
 
 - `scan`: List all detected elements (TestCases, Functions, etc.)
 - `remove-group`: Remove all test cases belonging to a specific test group.
