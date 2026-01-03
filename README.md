@@ -53,6 +53,29 @@ capl-forge/
 - `api.py` – Exposes 
 
 
+## Logging
+
+The library includes a flexible logging system that can be configured in `src/capl_tools_lib/common.py`.
+
+### Configuration
+
+Open `src/capl_tools_lib/common.py` to adjust settings:
+
+- **ENABLE_LOGGING**: Master switch to enable/disable all output.
+- **DEFAULT_LEVEL**: Default level (e.g., `logging.WARNING`) for all modules.
+- **MODULE_CONFIG**: Dictionary to enable specific logging levels for individual files (e.g., `{"capl_tools_lib.scanner": logging.DEBUG}`).
+
+### Usage in Code
+
+```python
+from .common import get_logger
+
+logger = get_logger(__name__)
+
+logger.debug("Debug information")
+logger.warning("Something might be wrong")
+```
+
 ## Requirements
 
 - Python 3.11+
