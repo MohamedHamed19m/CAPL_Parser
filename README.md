@@ -1,2 +1,73 @@
 # CAPL_Parser
-Repo To Parse/Manipulate CAPL file
+
+A powerful command-line tool for parsing, analyzing, and manipulating CAPL (CAN Access Programming Language) files.
+
+## Features
+
+- **Parse CAPL Files** – Extract and analyze CAPL code structure
+- **Manipulate & Transform** – Modify CAPL code programmatically
+- **AST Operations** – Work with abstract syntax trees
+- **Validation** – Check CAPL syntax and semantics
+- **Code Generation** – Generate CAPL code from templates or specifications
+
+## Installation
+
+```bash
+pip install CAPL_Parser
+```
+
+Or install from source:
+
+```bash
+git clone https://github.com/MohamedHamed19m/CAPL_Parser 
+cd CAPL_Parser
+pip install -e .
+```
+
+## Project Structure
+
+```
+capl-forge/
+├── src/capl_tools_lib/
+│   ├── api.py          # Public API interface
+│   ├── core.py         # Core parsing logic
+│   ├── editor.py       # Code manipulation utilities
+│   ├── elements.py     # CAPL AST element definitions
+│   ├── scanner.py      # Lexical analysis
+│   └── common.py       # Shared utilities
+├── tests/
+│   ├── dev_script.py   # Development testing
+│   └── data/
+│       └── sample.can  # Sample CAPL file
+└── README.md
+```
+
+## Architecture
+
+**Scanner** → **Parser** → **AST** → **Editor/Transformer** → **Output**
+
+- `scanner.py` – extract 
+- `core.py` – Parses 
+- `elements.py` – Defines 
+- `editor.py` – Provides 
+- `api.py` – Exposes 
+
+
+## Requirements
+
+- Python 3.11+
+
+## Development
+
+Development script:
+```bash
+python tests/dev_script.py
+```
+
+## Contributing
+
+Contributions are welcome! Please submit issues and pull requests.
+
+## Support
+
+For issues and questions, please open an issue on the repository.

@@ -1,0 +1,17 @@
+[project]
+name = "CAPL_Parser"
+version = "0.1.0"
+description = "A parser for CAPL files."
+readme = "README.md"
+authors = [
+    { name = "Mohamed Hamed Othman", email = "mohamedahamed1915@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.uv]
+package = true
+
+[build-system]
+requires = ["uv_build>=0.8.6,<0.9.0"]
+build-backend = "uv_build

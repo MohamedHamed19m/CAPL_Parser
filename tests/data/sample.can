@@ -1,0 +1,27 @@
+includes {
+    #include "common_lib.cin"
+}
+
+variables {
+    int gCounter = 0;
+    message EngineStatus msg1;
+    msTimer tCyclic;
+}
+
+on start {
+    write("Simulation Started");
+    setTimer(tCyclic, 100);
+}
+
+on message EngineStatus {
+    gCounter++;
+    processData(this.RPM);
+}
+
+on timer tCyclic {
+    setTimer(tCyclic, 100);
+}
+
+void processData(int value) {
+    if(value > 3000) write("High RPM!");
+}
