@@ -15,10 +15,20 @@ class CAPLElement:
         return (self.start_line, self.end_line)
     
 class TestCase(CAPLElement):
+    # Prevent pytest from collecting this as a test class
+    __test__ = False
+
     def __init__(self, name: str, description: str, start_line: int, end_line: int, group: Optional[str] = None):
         super().__init__(name, start_line, end_line, signature=f"testcase {name}()")
         self.description: str     = description
-        self.group: Optional[str] = group
+        
+        # Group Attributes
+        self.group_name: str = group if group else "Default"
+        self.have_group: bool = group is not None and group != "Default"
+
+    def __repr__(self) -> str:
+        return f"TestCase(name={self.name}, group={self.group_name}, lines {self.start_line}-{self.end_line})"
+
 
 class Handler(CAPLElement):
     def __init__(self, name: str, event_type: str, condition: str, start_line: int, end_line: int, signature: Optional[str] = None):

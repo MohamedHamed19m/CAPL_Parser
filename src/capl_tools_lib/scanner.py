@@ -109,22 +109,34 @@ class HandlerScanner(CaplScanningStrategy):
         return elements
 
 class TestCaseScanner(CaplScanningStrategy):
-    """ Scans for TestCases """
+    """ Scans for TestCases and identifies their group association. """
     PATTERN = re.compile(r'^\s*testcase\s+(\w+)\s*\(')
+    GROUP_PATTERN = re.compile(r'(?:InitializeTestGroup|CreateTestGroup)\s*\(\s*"([^"]+)"\s*\)')
 
     def scan(self, file_manager: CaplFileManager) -> List[CAPLElement]:
         elements = []
         lines = file_manager.lines
+        current_group = "Default"
 
         for i, line in enumerate(lines):
             match = self.PATTERN.match(line)
             if match:
                 end_line = self.find_block_end(lines, i)
+                
+                # Check for group initialization inside the testcase body
+                body_lines = lines[i:end_line+1]
+                body_content = "".join(body_lines)
+                
+                group_match = self.GROUP_PATTERN.search(body_content)
+                if group_match:
+                    current_group = group_match.group(1)
+                
                 elements.append(TestCase(
                     name=match.group(1),
                     description="", 
                     start_line=i,
-                    end_line=end_line
+                    end_line=end_line,
+                    group=current_group
                 ))
         return elements
 
