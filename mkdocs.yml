@@ -18,5 +18,4 @@ nav:
   - Home: index.md
   - API Reference:
       - Processor: reference/processor.md
-      - Manager: reference/manager.md
       - CLI Reference: reference/cli.md
