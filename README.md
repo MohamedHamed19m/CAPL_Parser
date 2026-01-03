@@ -2,7 +2,6 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/capl-tools-lib.svg)](https://pypi.org/project/capl-tools-lib/)
 [![Python versions](https://img.shields.io/pypi/pyversions/capl-tools-lib.svg)](https://pypi.org/project/capl-tools-lib/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A powerful command-line tool for parsing, analyzing, and manipulating CAPL (CAN Access Programming Language) files.
 
