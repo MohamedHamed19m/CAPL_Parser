@@ -49,10 +49,9 @@ def scan(
     table.add_column("Lines", style="green")
 
     for el in elements:
-        name = getattr(el, 'name', "---")
         table.add_row(
             el.__class__.__name__,
-            str(name),
+            el.display_name,
             f"{el.start_line}-{el.end_line}"
         )
 
