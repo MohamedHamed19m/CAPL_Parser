@@ -160,10 +160,10 @@ uv add lark
 ```
 
 ### 4. How to use your package in scripts
-Because the project uses a `src` layout with `package = true`, `uv` installs the package in editable mode by default. In your scripts, you can simply write:
+Because the project uses a `src` layout with `tool.uv.package = true`, `uv` installs the package in editable mode by default. In your scripts, you can simply write:
 
 ```python
-from capl_tools_lib import core
+from capl_tools_lib.processor import CaplProcessor
 ```
 
 ## Contributing
