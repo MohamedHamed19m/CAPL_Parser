@@ -12,10 +12,16 @@ class CaplEditor:
     """ 
     Handles modification of CAPL file content, including deleting, inserting and replacing blocks
     """
-    def __init__(self, file_mngr: CaplFileManager) -> None:
+    def __init__(self, file_mngr: Optional[CaplFileManager] = None, lines: Optional[List[str]] = None) -> None:
         self.file_mngr = file_mngr
-        self._current_lines : List[str] = list(file_mngr.lines)  # Make a copy to work on
-        logger.debug(f"CaplEditor initialized for {file_mngr.file_path}")
+        if lines is not None:
+            self._current_lines = list(lines)
+        elif file_mngr is not None:
+            self._current_lines = list(file_mngr.lines)
+        else:
+            raise ValueError("Either file_mngr or lines must be provided to CaplEditor")
+            
+        logger.debug("CaplEditor initialized")
 
     def get_lines(self) -> List[str]:
         """ Returns the current state of the modified lines. """

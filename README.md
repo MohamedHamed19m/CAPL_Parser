@@ -144,6 +144,15 @@ logger.warning("Something might be wrong")
 
 - Python 3.11+
 
+## Testing
+```powershell
+# Run the group detection tests
+uv run pytest tests/test_group_scanning.py
+
+# Run tests with coverage report
+ uv run pytest --cov=capl_tools_lib --cov-report=term-missing
+```
+
 ## Development with uv
 
 This project uses `uv` for lightning-fast Python package and environment management.
@@ -156,25 +165,14 @@ Run this in your root directory (`CAPL_Parser`). This command will create the `u
 uv sync
 ```
 
-### 2. Run Development Scripts
-`uv run` ensures the environment is up to date before executing the script.
-
-```powershell
-# Run the scanner demo
-uv run tests/dev_code.py
-
-# Run the group detection tests
-uv run pytest tests/test_group_scanning.py
-```
-
-### 3. Adding Dependencies
+### 2. Adding Dependencies
 If you need libraries for your parser (like `lark`, `ply`, or `regex`), add them using:
 
 ```powershell
 uv add lark
 ```
 
-### 4. How to use your package in scripts
+### 3. How to use your package in scripts
 Because the project uses a `src` layout with `tool.uv.package = true`, `uv` installs the package in editable mode by default. In your scripts, you can simply write:
 
 ```python
