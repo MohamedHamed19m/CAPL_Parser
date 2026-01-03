@@ -3,14 +3,16 @@ from pathlib import Path
 from typing import Optional
 from typing_extensions import Annotated
 from rich.console import Console
+from rich.console import Console
 from rich.table import Table
+from rich.panel import Panel
 
 # Import your internal logic
 from capl_tools_lib.core import CaplFileManager
 from capl_tools_lib.scanner import CaplScanner
 
 app = typer.Typer(
-    name="capl-tools",
+    name="capl_tools",
     help="A powerful CLI for parsing and manipulating CAPL files.",
     add_completion=False,
 )
@@ -27,21 +29,34 @@ def scan(
         typer.secho(f"Error: File {path} not found.", fg=typer.colors.RED)
         raise typer.Exit(code=1)
 
+    console      = Console()
     file_manager = CaplFileManager(path)
-    scanner = CaplScanner(file_manager)
-    elements = scanner.scan_all()
-
+    scanner      = CaplScanner(file_manager)
+    elements     = scanner.scan_all()
     typer.echo(f"Found {len(elements)} elements in {path.name}:")
+
     
     if summary:
-        # Just print counts per type
         from collections import Counter
         counts = Counter(el.__class__.__name__ for el in elements)
-        for type_name, count in counts.items():
-            typer.echo(f" - {type_name}: {count}")
-        return
+        
+        # Create a mini-table for the summary
+        summary_table = Table(show_header=True, header_style="bold magenta", box=None)
+        summary_table.add_column("Element Type", width=20)
+        summary_table.add_column("Count", justify="right")
 
-    console = Console()
+        for type_name, count in counts.items():
+            summary_table.add_row(type_name, str(count))
+
+        # Wrap it in a nice Panel
+        console.print(Panel(
+            summary_table, 
+            title=f"[bold]Summary: {path.name}[/bold]", 
+            expand=False,
+            border_style="cyan"
+        ))
+        return
+    
     table = Table(title=f"Elements in {path.name}")
 
     table.add_column("Type", style="cyan")

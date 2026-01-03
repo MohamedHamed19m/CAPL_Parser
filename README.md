@@ -51,13 +51,13 @@ The library includes a powerful Command Line Interface (CLI) powered by **Typer*
 
 ```bash
 # Show help
-uv run capl-tools --help
+uv run capl_tools --help
 
 # Scan a file and show table of elements
-uv run capl-tools scan tests/data/sample.can
+uv run capl_-_tools scan tests/data/sample.can
 
 # Scan and show only summary counts
-uv run capl-tools scan tests/data/sample.can --summary
+uv run capl_-_tools scan tests/data/sample.can --summary
 ```
 
 ### Available Commands
