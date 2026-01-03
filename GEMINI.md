@@ -30,6 +30,8 @@ The scanner delegates work to specialized strategy classes, making it easy to ex
     -   *Note*: Ignores statements that look like handlers but end in `;` (e.g. inside other functions).
 4.  **TestCaseScanner**:
     -   Specifically finds `testcase Name() { ... }` blocks.
+    -   **Group Detection**: Identifies group associations by scanning for `InitializeTestGroup("Name")` or `CreateTestGroup("Name")` calls within test cases.
+    -   **Stateful Propagation**: Once a group is identified, it is automatically assigned to all subsequent test cases in the file until a new group is defined (defaults to "Default").
 5.  **FunctionScanner**:
     -   Finds `testfunction` definitions.
     -   Finds standard CAPL functions (e.g., `void func(int a)`).
