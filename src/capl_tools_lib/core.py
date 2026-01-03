@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from common import get_logger
+from capl_tools_lib.common import get_logger
 TEST_STATUS_PASS = 1
 TEST_STATUS_FAIL = 0
 TEST_STATUS_SKIPPED = -2

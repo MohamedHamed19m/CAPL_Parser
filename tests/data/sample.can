@@ -54,7 +54,7 @@ testcase TC2_MessageHandling()
 {
     EngineStatus testMsg;
     testMsg.RPM = 3200;
-    on message EngineStatus(testMsg);
+    write("Simulating EngineStatus Message with RPM: ", testMsg.RPM);
 }
 
 testcase Timer_StartTestSeries() {
@@ -63,5 +63,5 @@ testcase Timer_StartTestSeries() {
 
 testcase TC3_TimerFunctionality()
 {
-    on timer tCyclic();
+    write("Testing Timer Functionality");
 }
