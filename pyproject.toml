@@ -1,6 +1,6 @@
 [project]
 name = "capl-tools-lib" # PyPI distribution name (hyphens)
-version = "0.1.0"
+version = "0.2.0"
 description = "A parser for CAPL files."
 readme = "README.md"
 authors = [

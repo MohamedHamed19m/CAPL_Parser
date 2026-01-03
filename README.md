@@ -179,6 +179,10 @@ Because the project uses a `src` layout with `tool.uv.package = true`, `uv` inst
 from capl_tools_lib.processor import CaplProcessor
 ```
 
+## Versioning
+
+This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). For a detailed list of changes, please refer to the [CHANGELOG.md](CHANGELOG.md).
+
 ## Contributing
 
 Contributions are welcome! Please submit issues and pull requests.
