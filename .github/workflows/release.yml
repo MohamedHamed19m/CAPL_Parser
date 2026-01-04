@@ -30,7 +30,7 @@ jobs:
       # 3. Extract Release Notes for the specific tag
       - name: Extract Release Notes
         id: extract_changelog
-        uses: softprops/changelog-reader-action@v1
+        uses: re-actors/changelog-reader-action@v2
         with:
           version: ${{ github.ref_name }}
           path: CHANGELOG.md
