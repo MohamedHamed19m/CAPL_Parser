@@ -13,28 +13,9 @@ capl-tools = "capl_tools_lib.cli:main"
 ```
 
 ### Instructions
-When helping me with this repo, always ensure commit messages follow the Conventional Commits specification (e.g., feat:, fix:, docs:, chore:). Before suggesting a release, remind me to run uv run cz bump to handle versioning and changelog generation
+- When helping me with this repo, always ensure commit messages follow the Conventional Commits specification (e.g., feat:, fix:, docs:, chore:). Before suggesting a release, remind me to run uv run cz bump to handle versioning and changelog generation
 
-### Commands
-
-#### `scan`
-Scans a CAPL file and displays detected elements.
-- **Arguments**: `path` (Path to .can file)
-- **Options**: `--summary` / `-s` (Show counts only)
-- **Output**: Uses `rich` to display a formatted table or summary list.
-
-#### `remove-group`
-Removes all test cases belonging to a specific test group.
-- **Arguments**: 
-    - `path`: Path to .can file
-    - `group`: Name of the test group to remove
-- **Output**: Confirmation message with count of removed test cases.
-
-#### `validate` (Stub)
-Intended for syntax and semantic validation.
-
-#### `transform` (Stub)
-Intended for applying programmatic transformations to the code.
+- When Adding/Removing commands from cli.py make sure to Update README.md Commands section.
 
 ---
 
