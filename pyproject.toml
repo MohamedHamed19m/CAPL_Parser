@@ -17,7 +17,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
 ]
 dependencies = [
-    "typer[all]>=0.12.0",
+    "typer>=0.12.0",
     "rich>=13.0.0",
 ]
 
@@ -46,6 +46,7 @@ dev = [
 packages = ["src/capl_tools_lib"]
 
 [project.scripts]
+capl-tools-lib = "capl_tools_lib.cli:main"
 capl_tools = "capl_tools_lib.cli:main"
 
 [tool.pytest.ini_options]

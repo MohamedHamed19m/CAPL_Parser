@@ -149,6 +149,8 @@ file_manager.save_file(target_path=Path("file.can"), lines=new_lines, backup=Tru
 - The _dirty Flag Sync
 Your CaplProcessor logic for the _dirty flag is excellent.
 
+- dont foregt to update CHANGELOG.md when creating new tag.
+
 Reminder: Whenever you add a new "Edit" feature (like insert_test_case), remember to set self._dirty = True so the Scanner knows the line numbers have shifted before the next scan().
 
 ## Development Environment Setup
