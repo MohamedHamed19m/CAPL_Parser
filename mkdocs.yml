@@ -1,4 +1,6 @@
 site_name: CAPL Tools Lib
+site_url: https://MohamedHamed19m.github.io/CAPL_Parser/
+repo_url: https://github.com/MohamedHamed19m/CAPL_Parser
 theme:
   name: material
 

@@ -25,6 +25,7 @@ dependencies = [
 Homepage = "https://github.com/MohamedHamed19m/CAPL_Parser"
 Repository = "https://github.com/MohamedHamed19m/CAPL_Parser"
 Issues = "https://github.com/MohamedHamed19m/CAPL_Parser/issues"
+Documentation = "https://MohamedHamed19m.github.io/CAPL_Parser/"
 
 [tool.uv]
 package = true
