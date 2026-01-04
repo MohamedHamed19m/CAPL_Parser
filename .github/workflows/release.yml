@@ -38,10 +38,10 @@ jobs:
           
           # Adding ./dist/* at the end tells GitHub to upload everything in the dist folder
           gh release create "${{ github.ref_name }}" \
-            ./dist/* \
             --title "Release ${{ github.ref_name }}" \
             --notes "$NOTES" \
-            --if-not-exists
+            --if-not-exists \
+            ./dist/*
 
       # 3. Setup Python and Build the package
       - name: Install uv
