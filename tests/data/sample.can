@@ -38,6 +38,10 @@ void processData(int value) {
     if(value > 3000) write("High RPM!");
 }
 
+testcase TC_Inserted() {
+    write("This was inserted automatically");
+}
+
 
 testfunction testProcessData() {
     int testValue = 3500;
@@ -64,4 +68,7 @@ testcase Timer_StartTestSeries() {
 testcase TC3_TimerFunctionality()
 {
     write("Testing Timer Functionality");
+}
+testcase TC_GroupTest() {
+    write("Testing group insertion");
 }
