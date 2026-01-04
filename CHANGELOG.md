@@ -42,6 +42,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI tool with `scan` and `remove-group` commands.
 - Basic project structure and documentation.
 
+## v2.0.0 (2026-01-04)
+
+### Feat
+
+- unify remove command and implement TestGroup as an element
+
 ## v1.1.1 (2026-01-04)
 
 ### Fix
