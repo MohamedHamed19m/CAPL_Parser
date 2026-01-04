@@ -59,6 +59,18 @@ class TestCase(CAPLElement):
         })
         return d
 
+class TestGroup(CAPLElement):
+    __test__ = False
+    def __init__(self, name: str, start_line: int, end_line: int):
+        super().__init__(name, start_line, end_line, signature=f"testgroup {name}")
+        self.test_cases: List[str] = [] # Names of test cases in this group
+
+    def to_dict(self) -> dict[str, Any]:
+        d = super().to_dict()
+        d.update({
+            "test_cases": self.test_cases
+        })
+        return d
 
 class Handler(CAPLElement):
     def __init__(self, name: str, event_type: str, condition: str, start_line: int, end_line: int, signature: Optional[str] = None):

@@ -19,6 +19,7 @@ class ElementType(str, Enum):
     TestFunction = "TestFunction"
     Include = "CaplInclude"
     Variable = "CaplVariable"
+    TestGroup = "TestGroup"
 
 app = typer.Typer(
     name="capl_tools",
@@ -96,31 +97,9 @@ def scan(
     console.print(table)
 
 @app.command()
-def remove_group(
-    path: Annotated[Path, typer.Argument(help="Path to the .can file")],
-    group: Annotated[str, typer.Argument(help="Name of the test group to remove")]
-):
-    """
-    Remove all test cases belonging to a specific test group.
-    """
-    if not path.exists():
-        typer.secho(f"Error: File {path} not found.", fg=typer.colors.RED)
-        raise typer.Exit(code=1)
-
-    processor = CaplProcessor(path)
-    count = processor.remove_test_group(group)
-    
-    if count > 0:
-        processor.save()
-        typer.secho(f"Successfully removed {count} test cases from group '{group}' in {path.name}.", fg=typer.colors.GREEN)
-    else:
-        typer.secho(f"No test cases found in group '{group}'.", fg=typer.colors.YELLOW)
-        
-
-@app.command()
 def remove(
     path: Annotated[Path, typer.Argument(help="Path to the .can file")],
-    element_type: Annotated[str, typer.Option("--type", "-t", help="Type of element to remove (e.g. TestCase, Function, Handler)")],
+    element_type: Annotated[ElementType, typer.Option("--type", "-t", help="Type of element to remove")],
     name: Annotated[str, typer.Option("--name", "-n", help="Name of the element to remove")]
 ):
     """
@@ -131,13 +110,17 @@ def remove(
         raise typer.Exit(code=1)
 
     processor = CaplProcessor(path)
-    count = processor.remove_element(element_type, name)
+    
+    if element_type == ElementType.TestGroup:
+        count = processor.remove_test_group(name)
+    else:
+        count = processor.remove_element(element_type.value, name)
     
     if count > 0:
         processor.save()
-        typer.secho(f"Successfully removed {count} elements of type '{element_type}' named '{name}' in {path.name}.", fg=typer.colors.GREEN)
+        typer.secho(f"Successfully removed {count} elements of type '{element_type.value}' named '{name}' in {path.name}.", fg=typer.colors.GREEN)
     else:
-        typer.secho(f"No elements found matching type '{element_type}' and name '{name}'.", fg=typer.colors.YELLOW)
+        typer.secho(f"No elements found matching type '{element_type.value}' and name '{name}'.", fg=typer.colors.YELLOW)
 
 
 @app.command()

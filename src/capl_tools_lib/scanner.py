@@ -2,7 +2,7 @@ import re
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Optional, Type
 from capl_tools_lib.file_manager import CaplFileManager
-from capl_tools_lib.elements import CAPLElement, TestCase, Handler, Function, TestFunction, CaplInclude, CaplVariable
+from capl_tools_lib.elements import CAPLElement, TestCase, Handler, Function, TestFunction, CaplInclude, CaplVariable, TestGroup
 from capl_tools_lib.common import get_logger
 
 logger = get_logger(__name__)
@@ -117,6 +117,7 @@ class TestCaseScanner(CaplScanningStrategy):
         elements = []
         lines = file_manager.lines
         current_group = "Default"
+        groups: dict[str, TestGroup] = {}
 
         for i, line in enumerate(lines):
             match = self.PATTERN.match(line)
@@ -129,15 +130,31 @@ class TestCaseScanner(CaplScanningStrategy):
                 
                 group_match = self.GROUP_PATTERN.search(body_content)
                 if group_match:
-                    current_group = group_match.group(1)
+                    new_group_name = group_match.group(1)
+                    if new_group_name != current_group:
+                        current_group = new_group_name
+                        # Find line within body
+                        init_line_offset = 0
+                        for idx, bline in enumerate(body_lines):
+                            if group_match.group(0) in bline:
+                                init_line_offset = idx
+                                break
+                        
+                        group_el = TestGroup(current_group, i + init_line_offset, i + init_line_offset)
+                        groups[current_group] = group_el
+                        elements.append(group_el)
                 
-                elements.append(TestCase(
+                test_case = TestCase(
                     name=match.group(1),
                     description="", 
                     start_line=i,
                     end_line=end_line,
                     group=current_group
-                ))
+                )
+                elements.append(test_case)
+                if current_group in groups:
+                    groups[current_group].test_cases.append(test_case.name)
+                    
         return elements
 
 class FunctionScanner(CaplScanningStrategy):
