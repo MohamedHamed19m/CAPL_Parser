@@ -27,41 +27,25 @@ jobs:
       - name: Build Package
         run: uv build
 
-      # 3. Get Version Number (Strip 'v' prefix)
-      - name: Get Version Number
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
-
-      # 4. Extract Release Notes using minddocdev/changelog-reader-action
+      # 3. Extract Release Notes for the specific tag
       - name: Extract Release Notes
-        id: extract-release-notes
-        uses: minddocdev/changelog-reader-action@v2
+        id: extract_changelog
+        uses: softprops/changelog-reader-action@v1
         with:
-          version: ${{ steps.get_version.outputs.VERSION }}
+          version: ${{ github.ref_name }}
           path: CHANGELOG.md
 
-      # 5. Create/Update GitHub Release
+      # 4. Create/Update the GitHub Release using the modern action
       - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: ${{ steps.extract_changelog.outputs.changes }}
+          files: ./dist/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Use the output from the changelog reader
-          NOTES="${{ steps.extract-release-notes.outputs.changes }}"
-          
-          # Check if release exists; if not, create it.
-          if gh release view "${{ github.ref_name }}" >/dev/null 2>&1; then
-            echo "Release already exists. Updating notes..."
-            gh release edit "${{ github.ref_name }}" --notes "$NOTES"
-          else
-            echo "Creating new release..."
-            gh release create "${{ github.ref_name }}" \
-              --title "Release ${{ github.ref_name }}" \
-              --notes "$NOTES"
-          fi
-          
-          # Upload the built files from the dist/ folder
-          gh release upload "${{ github.ref_name }}" ./dist/* --clobber
 
-      # 6. Publish to PyPI
+      # 5. Publish to PyPI
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
