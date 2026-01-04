@@ -1,9 +1,8 @@
 import typer
-import json
 from toon import encode as toon_encode
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any
 from typing_extensions import Annotated
 from rich.console import Console
 from rich.table import Table
@@ -11,6 +10,18 @@ from rich.panel import Panel
 
 # Import your internal logic
 from capl_tools_lib.processor import CaplProcessor
+
+def _project_element(el: Any, include_lines: bool = False) -> dict:
+    """
+    Projects the element data into a dictionary. 
+    Following SRP: The CLI handles presentation filtering.
+    """
+    data = el.to_dict()
+    if not include_lines:
+        # Strip physical location data for a 'clean' logical view
+        data.pop("start_line", None)
+        data.pop("end_line", None)
+    return data
 
 class ElementType(str, Enum):
     TestCase = "TestCase"
@@ -30,12 +41,11 @@ app = typer.Typer(
 @app.command()
 def scan(
     path: Annotated[Path, typer.Argument(help="Path to the .can file")],
-    summary: bool = typer.Option(False, "--summary", "-s", help="Show only a summary"),
-    json_output: bool = typer.Option(False, "--json", help="Output results in JSON format"),
-    toon_output: bool = typer.Option(False, "--toon", help="Output results in TOON format (Token-Oriented Object Notation)")
+    toon_output: bool = typer.Option(False, "--toon", help="Output structure in TOON"),
+    full: bool = typer.Option(False, "--full", help="Include physical line numbers in the output")
 ):
     """
-    Scan a CAPL file and list all detected elements (TestCases, Functions, etc.)
+    List the logical structure of a CAPL file (Names, Signatures, and Types).
     """
     if not path.exists():
         typer.secho(f"Error: File {path} not found.", fg=typer.colors.RED)
@@ -45,56 +55,67 @@ def scan(
     processor = CaplProcessor(path)
     elements = processor.scan()
 
-    if json_output:
-        # Serialize elements to JSON and print
-        data = [el.to_dict() for el in elements]
-        typer.echo(json.dumps(data, indent=2))
-        return
-
     if toon_output:
-        # Serialize elements to TOON and print
-        data = [el.to_dict() for el in elements]
+        # Create a lean list of dictionaries based on the 'full' flag
+        data = [_project_element(el, include_lines=full) for el in elements]
         typer.echo(toon_encode(data))
         return
 
-    typer.echo(f"Found {len(elements)} elements in {path.name}:")
-
-    
-    if summary:
-        from collections import Counter
-        counts = Counter(el.__class__.__name__ for el in elements)
-        
-        # Create a mini-table for the summary
-        summary_table = Table(show_header=True, header_style="bold magenta", box=None)
-        summary_table.add_column("Element Type", width=20)
-        summary_table.add_column("Count", justify="right")
-
-        for type_name, count in counts.items():
-            summary_table.add_row(type_name, str(count))
-
-        # Wrap it in a nice Panel
-        console.print(Panel(
-            summary_table, 
-            title=f"[bold]Summary: {path.name}[/bold]", 
-            expand=False,
-            border_style="cyan"
-        ))
-        return
-    
-    table = Table(title=f"Elements in {path.name}")
-
+    # Human-readable table
+    table = Table(title=f"Structure: {path.name}", box=None)
     table.add_column("Type", style="cyan")
-    table.add_column("Name", style="magenta")
-    table.add_column("Lines", style="green")
+    table.add_column("Signature", style="magenta")
+    if full:
+        table.add_column("Lines", style="green", justify="right")
 
     for el in elements:
-        table.add_row(
-            el.__class__.__name__,
-            el.display_name,
-            f"{el.start_line}-{el.end_line}"
-        )
+        row = [el.__class__.__name__, el.display_name]
+        if full:
+            row.append(f"{el.start_line}-{el.end_line}")
+        table.add_row(*row)
 
     console.print(table)
+    console.print(f"\n[dim]Found {len(elements)} elements. Use 'stats' for a high-level summary.[/dim]")
+
+@app.command()
+def stats(
+    path: Annotated[Path, typer.Argument(help="Path to the .can file")],
+    machine: bool = typer.Option(False, "--machine", "-m", help="Single-line output (e.g., TestCase:15|Function:3)")
+):
+    """
+    Get a highly compressed inventory of the CAPL file content.
+    """
+    if not path.exists():
+        typer.secho(f"Error: File {path} not found.", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+    processor = CaplProcessor(path)
+    elements = processor.scan()
+    
+    from collections import Counter
+    counts = Counter(el.__class__.__name__ for el in elements)
+
+    if machine:
+        # Super-compressed format for AI pipe usage or quick scripting
+        summary_str = "|".join([f"{k}:{v}" for k, v in sorted(counts.items())])
+        typer.echo(summary_str)
+        return
+
+    # Visual summary for humans
+    console = Console()
+    summary_table = Table(show_header=True, header_style="bold magenta", box=None)
+    summary_table.add_column("Element Type")
+    summary_table.add_column("Count", justify="right")
+
+    for type_name, count in sorted(counts.items()):
+        summary_table.add_row(type_name, str(count))
+
+    console.print(Panel(
+        summary_table, 
+        title=f"Inventory: {path.name}", 
+        expand=False, 
+        border_style="cyan"
+    ))
 
 @app.command()
 def remove(

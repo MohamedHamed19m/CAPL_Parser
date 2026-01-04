@@ -11,7 +11,8 @@ from capl_tools_lib.elements import (
     Handler, 
     Function, 
     TestFunction, 
-    TestCase
+    TestCase,
+    TestGroup
 )
 
 
@@ -130,7 +131,7 @@ class TestElementCounting:
     def test_total_element_count(self, scanner):
         """Test total number of elements found"""
         elements = scanner.scan_all()
-        assert len(elements) == 13
+        assert len(elements) == 14
     
     def test_include_count(self, scanner):
         """Test number of include blocks found"""
@@ -167,6 +168,12 @@ class TestElementCounting:
         elements = scanner.scan_all()
         test_cases = [e for e in elements if isinstance(e, TestCase)]
         assert len(test_cases) == 4
+
+    def test_testgroup_count(self, scanner):
+        """Test number of test groups found"""
+        elements = scanner.scan_all()
+        test_groups = [e for e in elements if isinstance(e, TestGroup)]
+        assert len(test_groups) == 1
 
 
 class TestElementDetails:

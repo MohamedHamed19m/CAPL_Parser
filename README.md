@@ -65,11 +65,17 @@ Once installed, you can use the `capl_tools` command directly from your terminal
 # Show help
 capl_tools --help
 
-# Scan a file and show table of elements
+# Get a high-level inventory of the file (Quick Overview)
+capl_tools stats path/to/your_file.can
+
+# Get a machine-readable compressed summary (Ideal for AI Context)
+capl_tools stats path/to/your_file.can --machine
+
+# Scan file structure (Clean logical view, no line numbers)
 capl_tools scan path/to/your_file.can
 
-# Scan and output in machine-readable JSON (AI-Agent Ready)
-capl_tools scan path/to/your_file.can --json
+# Scan with physical location data (Surgical view)
+capl_tools scan path/to/your_file.can --full
 
 # Scan and output in token-efficient TOON format (Optimized for LLMs)
 capl_tools scan path/to/your_file.can --toon
@@ -92,7 +98,8 @@ capl_tools remove path/to/your_file.can --type TestGroup --name "MyTestGroup"
 
 ### Available Commands
 
-- `scan`: List all detected elements. Supports `--json` and `--toon` (Token-Oriented Object Notation) for automation and LLM efficiency.
+- `scan`: List logical structure. Supports `--toon` for automation and `--full` for physical location data.
+- `stats`: specific high-level inventory. Supports `--machine` for single-line summary.
 - `get`: Extract the raw code of a specific element (TestCase, Function, etc.).
 - `insert`: Surgically inject code using semantic anchors (`after:<name>`, `section:<group>`, `line:<num>`).
 - `remove`: Unified command to delete specific elements by type and name (supports `TestCase`, `Function`, `TestGroup`, etc.).
