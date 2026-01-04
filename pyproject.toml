@@ -1,6 +1,6 @@
 [project]
 name = "capl-tools-lib" # PyPI distribution name (hyphens)
-version = "0.3.0"
+version = "1.0.0"
 description = "A parser for CAPL files."
 readme = "README.md"
 authors = [
@@ -58,7 +58,7 @@ pythonpath = ["src"]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.3.0"
+version = "1.0.0"
 tag_format = "v$version"
 version_files = [
     "pyproject.toml:version"
