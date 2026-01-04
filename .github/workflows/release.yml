@@ -32,12 +32,12 @@ jobs:
         id: get_version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
-      # 4. Extract Release Notes using softprops/changelog-reader-action
+      # 4. Extract Release Notes using minddocdev/changelog-reader-action
       - name: Extract Release Notes
         id: extract-release-notes
-        uses: softprops/changelog-reader-action@v2
+        uses: minddocdev/changelog-reader-action@v2
         with:
-          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          version: ${{ steps.get_version.outputs.VERSION }}
           path: CHANGELOG.md
 
       # 5. Create/Update GitHub Release
