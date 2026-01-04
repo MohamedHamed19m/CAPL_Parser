@@ -26,21 +26,22 @@ jobs:
         id: extract-release-notes
         uses: ffurrer2/extract-release-notes@v2
 
-      # 2. Create the GitHub Release automatically
+      # 2. Create the GitHub Release and upload built assets
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # We use printf to handle special characters in release notes safely
           NOTES=$(cat << 'EOF'
           ${{ steps.extract-release-notes.outputs.release_notes }}
           EOF
           )
           
+          # Adding ./dist/* at the end tells GitHub to upload everything in the dist folder
           gh release create "${{ github.ref_name }}" \
+            ./dist/* \
             --title "Release ${{ github.ref_name }}" \
             --notes "$NOTES" \
-            --replaces-artifact || echo "Release already exists, moving to publish step."
+            --if-not-exists
 
       # 3. Setup Python and Build the package
       - name: Install uv
