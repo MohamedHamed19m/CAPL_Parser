@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.3] - 2026-01-04
 ### Removed
 - CLI `transform` command (stub).
+### Fixed
+- Removed `--if-not-exists` flag from `gh release create` in `release.yml` due to incompatibility with GitHub Actions `gh` CLI version; reordered build and release steps to ensure files exist before upload and use manual check for release existence.
 
 ## [0.2.2] - 2026-01-04
 ### Fixed
