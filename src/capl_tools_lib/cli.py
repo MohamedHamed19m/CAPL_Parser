@@ -1,5 +1,6 @@
 import typer
 import json
+from enum import Enum
 from pathlib import Path
 from typing import Optional
 from typing_extensions import Annotated
@@ -9,6 +10,14 @@ from rich.panel import Panel
 
 # Import your internal logic
 from capl_tools_lib.processor import CaplProcessor
+
+class ElementType(str, Enum):
+    TestCase = "TestCase"
+    Function = "Function"
+    Handler = "Handler"
+    TestFunction = "TestFunction"
+    Include = "CaplInclude"
+    Variable = "CaplVariable"
 
 app = typer.Typer(
     name="capl_tools",
@@ -144,6 +153,46 @@ def get(
         typer.echo(code, nl=False)
     else:
         typer.secho(f"Error: Element '{name}' of type '{element_type}' not found.", fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def insert(
+    path: Annotated[Path, typer.Argument(help="Path to the .can file")],
+    location: Annotated[str, typer.Option("--location", "-l", help="Location: 'after:<name>', 'section:<name>', or 'line:<num>'")],
+    source: Annotated[Optional[Path], typer.Option("--source", "-s", help="Path to code snippet (omit to read from stdin)")] = None,
+    element_type: Annotated[Optional[ElementType], typer.Option("--type", "-t", help="Type of element being inserted")] = None,
+):
+    """
+    Insert code into a CAPL file using semantic anchoring.
+    """
+    if not path.exists():
+        typer.secho(f"Error: File {path} not found.", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+    # Read code from file or stdin
+    if source:
+        if not source.exists():
+            typer.secho(f"Error: Source file {source} not found.", fg=typer.colors.RED)
+            raise typer.Exit(code=1)
+        code = source.read_text()
+    else:
+        # Read from stdin
+        typer.echo("Reading code from stdin (Press Ctrl+Z/Ctrl+D to finish)...", err=True)
+        import sys
+        code = sys.stdin.read()
+
+    if not code:
+        typer.secho("Error: No code provided to insert.", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+    processor = CaplProcessor(path)
+    try:
+        line = processor.insert(location, code, element_type=element_type.value if element_type else None)
+        processor.save()
+        typer.secho(f"Successfully inserted {element_type.value if element_type else 'code'} at line {line} in {path.name}.", fg=typer.colors.GREEN)
+    except ValueError as e:
+        typer.secho(f"Error: {e}", fg=typer.colors.RED)
         raise typer.Exit(code=1)
 
 
