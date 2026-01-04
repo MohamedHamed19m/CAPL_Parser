@@ -4,6 +4,7 @@
 [![Python versions](https://img.shields.io/pypi/pyversions/capl-tools-lib.svg)](https://pypi.org/project/capl-tools-lib/)
 [![Publish to PyPI](https://github.com/MohamedHamed19m/CAPL_Parser/actions/workflows/publish.yml/badge.svg)](https://github.com/MohamedHamed19m/CAPL_Parser/actions/workflows/publish.yml)
 [![publish-docs](https://github.com/MohamedHamed19m/CAPL_Parser/actions/workflows/docs.yml/badge.svg)](https://github.com/MohamedHamed19m/CAPL_Parser/actions/workflows/docs.yml)
+[![Release](https://github.com/MohamedHamed19m/CAPL_Parser/actions/workflows/release.yml/badge.svg)](https://github.com/MohamedHamed19m/CAPL_Parser/actions/workflows/release.yml)
 
 A powerful command-line tool for parsing, analyzing, and manipulating CAPL (CAN Access Programming Language) files.
 

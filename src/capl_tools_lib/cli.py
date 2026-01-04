@@ -91,14 +91,6 @@ def remove_group(
     else:
         typer.secho(f"No test cases found in group '{group}'.", fg=typer.colors.YELLOW)
         
-@app.command()
-def validate(path: Path):
-    """
-    Check CAPL syntax and semantics.
-    """
-    typer.echo(f"Validating {path}...")
-    # TODO: Implement validation logic
-    typer.secho("Validation passed!", fg=typer.colors.GREEN)
 
 @app.command()
 def transform(
