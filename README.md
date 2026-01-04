@@ -68,8 +68,17 @@ capl_tools --help
 # Scan a file and show table of elements
 capl_tools scan path/to/your_file.can
 
-# Scan and show only summary counts
-capl_tools scan path/to/your_file.can --summary
+# Scan and output in machine-readable JSON (AI-Agent Ready)
+capl_tools scan path/to/your_file.can --json
+
+# Fetch raw code of a specific element (Surgical Context)
+capl_tools get path/to/your_file.can MyFunction --type Function
+
+# Insert code using semantic anchoring
+capl_tools insert path/to/your_file.can --location after:MyFunction --source snippet.can --type TestCase
+
+# Remove a specific element by name and type
+capl_tools remove path/to/your_file.can --type TestCase --name "DeprecatedTest"
 
 # Remove a specific test group
 capl_tools remove-group path/to/your_file.can "MyTestGroup"
@@ -80,7 +89,10 @@ capl_tools remove-group path/to/your_file.can "MyTestGroup"
 
 ### Available Commands
 
-- `scan`: List all detected elements (TestCases, Functions, etc.)
+- `scan`: List all detected elements. Supports `--json` for automation.
+- `get`: Extract the raw code of a specific element (TestCase, Function, etc.).
+- `insert`: Surgically inject code using semantic anchors (`after:<name>`, `section:<group>`, `line:<num>`).
+- `remove`: Delete a specific element by type and name.
 - `remove-group`: Remove all test cases belonging to a specific test group.
 
 ## Library Usage
