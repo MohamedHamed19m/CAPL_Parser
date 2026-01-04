@@ -12,6 +12,9 @@ The CLI is registered in `pyproject.toml` under `[project.scripts]`:
 capl-tools = "capl_tools_lib.cli:main"
 ```
 
+### Instructions
+When helping me with this repo, always ensure commit messages follow the Conventional Commits specification (e.g., feat:, fix:, docs:, chore:). Before suggesting a release, remind me to run uv run cz bump to handle versioning and changelog generation
+
 ### Commands
 
 #### `scan`

@@ -40,6 +40,7 @@ dev = [
     "mkdocs-material>=9.7.1",
     "mkdocs-typer2>=0.1.6",
     "mkdocstrings[python]>=1.0.0",
+    "pre-commit>=4.5.1",
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
 ]
@@ -62,3 +63,5 @@ tag_format = "v$version"
 version_files = [
     "pyproject.toml:version"
 ]
+update_changelog_on_bump = true
+major_version_zero = true
