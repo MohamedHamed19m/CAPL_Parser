@@ -82,8 +82,6 @@ capl_tools remove-group path/to/your_file.can "MyTestGroup"
 
 - `scan`: List all detected elements (TestCases, Functions, etc.)
 - `remove-group`: Remove all test cases belonging to a specific test group.
-- `validate`: (Stub) Check CAPL syntax and semantics
-- `transform`: (Stub) Modify CAPL code programmatically
 
 ## Library Usage
 

@@ -18,6 +18,17 @@ class CAPLElement:
     
     def get_line_range(self) -> tuple[int, int]:
         return (self.start_line, self.end_line)
+
+    def to_dict(self) -> dict[str, Any]:
+        """Returns a dictionary representation of the element for JSON serialization."""
+        return {
+            "type": self.__class__.__name__,
+            "name": self.name,
+            "display_name": self.display_name,
+            "start_line": self.start_line,
+            "end_line": self.end_line,
+            "signature": self.signature
+        }
     
 class TestCase(CAPLElement):
     # Prevent pytest from collecting this as a test class
@@ -40,6 +51,14 @@ class TestCase(CAPLElement):
     def __repr__(self) -> str:
         return f"<TestCase name='{self.name}' group='{self.group_name}' lines={self.start_line}-{self.end_line}>"
 
+    def to_dict(self) -> dict[str, Any]:
+        d = super().to_dict()
+        d.update({
+            "description": self.description,
+            "group": self.group_name
+        })
+        return d
+
 
 class Handler(CAPLElement):
     def __init__(self, name: str, event_type: str, condition: str, start_line: int, end_line: int, signature: Optional[str] = None):
@@ -50,6 +69,14 @@ class Handler(CAPLElement):
     @property
     def display_name(self) -> str:
         return f"on {self.event_type} {self.condition}"
+
+    def to_dict(self) -> dict[str, Any]:
+        d = super().to_dict()
+        d.update({
+            "event_type": self.event_type,
+            "condition": self.condition
+        })
+        return d
 
 class Function(CAPLElement):
     def __init__(self, name: str, return_type: str, parameters: List[str], start_line: int, end_line: int, signature: Optional[str] = None):
@@ -64,6 +91,14 @@ class Function(CAPLElement):
     def __repr__(self) -> str:
         return f"<Function name='{self.name}' signature='{self.signature}' lines={self.start_line}-{self.end_line}>"
 
+    def to_dict(self) -> dict[str, Any]:
+        d = super().to_dict()
+        d.update({
+            "return_type": self.return_type,
+            "parameters": self.parameters
+        })
+        return d
+
 class TestFunction(CAPLElement):
     __test__ = False
     def __init__(self, name: str, params: List[str], start_line: int, end_line: int, signature: Optional[str] = None):
@@ -77,6 +112,13 @@ class TestFunction(CAPLElement):
     def __repr__(self) -> str:
         return f"<TestFunction name='{self.name}' signature='{self.signature}' lines={self.start_line}-{self.end_line}>"
     
+    def to_dict(self) -> dict[str, Any]:
+        d = super().to_dict()
+        d.update({
+            "params": self.params
+        })
+        return d
+    
 class CaplInclude(CAPLElement):
     def __init__(self, included_files: list[str], start_line: int, end_line: int):
         name = f"Includes ({len(included_files)} files)"
@@ -89,6 +131,13 @@ class CaplInclude(CAPLElement):
 
     def __repr__(self) -> str:
         return f"<CaplInclude files={len(self.included_files)} lines={self.start_line}-{self.end_line}>"
+
+    def to_dict(self) -> dict[str, Any]:
+        d = super().to_dict()
+        d.update({
+            "included_files": self.included_files
+        })
+        return d
 
 class CaplVariable(CAPLElement):
     def __init__(self,start_line: int, end_line: int):

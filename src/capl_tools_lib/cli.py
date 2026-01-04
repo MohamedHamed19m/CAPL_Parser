@@ -1,8 +1,8 @@
 import typer
+import json
 from pathlib import Path
 from typing import Optional
 from typing_extensions import Annotated
-from rich.console import Console
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
@@ -19,7 +19,8 @@ app = typer.Typer(
 @app.command()
 def scan(
     path: Annotated[Path, typer.Argument(help="Path to the .can file")],
-    summary: bool = typer.Option(False, "--summary", "-s", help="Show only a summary")
+    summary: bool = typer.Option(False, "--summary", "-s", help="Show only a summary"),
+    json_output: bool = typer.Option(False, "--json", help="Output results in JSON format")
 ):
     """
     Scan a CAPL file and list all detected elements (TestCases, Functions, etc.)
@@ -31,6 +32,13 @@ def scan(
     console = Console()
     processor = CaplProcessor(path)
     elements = processor.scan()
+
+    if json_output:
+        # Serialize elements to JSON and print
+        data = [el.to_dict() for el in elements]
+        typer.echo(json.dumps(data, indent=2))
+        return
+
     typer.echo(f"Found {len(elements)} elements in {path.name}:")
 
     
@@ -92,6 +100,51 @@ def remove_group(
         typer.secho(f"No test cases found in group '{group}'.", fg=typer.colors.YELLOW)
         
 
+@app.command()
+def remove(
+    path: Annotated[Path, typer.Argument(help="Path to the .can file")],
+    element_type: Annotated[str, typer.Option("--type", "-t", help="Type of element to remove (e.g. TestCase, Function, Handler)")],
+    name: Annotated[str, typer.Option("--name", "-n", help="Name of the element to remove")]
+):
+    """
+    Remove a specific element by its type and name.
+    """
+    if not path.exists():
+        typer.secho(f"Error: File {path} not found.", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+    processor = CaplProcessor(path)
+    count = processor.remove_element(element_type, name)
+    
+    if count > 0:
+        processor.save()
+        typer.secho(f"Successfully removed {count} elements of type '{element_type}' named '{name}' in {path.name}.", fg=typer.colors.GREEN)
+    else:
+        typer.secho(f"No elements found matching type '{element_type}' and name '{name}'.", fg=typer.colors.YELLOW)
+
+
+@app.command()
+def get(
+    path: Annotated[Path, typer.Argument(help="Path to the .can file")],
+    name: Annotated[str, typer.Argument(help="Name of the element to fetch")],
+    element_type: Annotated[str, typer.Option("--type", "-t", help="Type of element (e.g. TestCase, Function, Handler)")]
+):
+    """
+    Fetch the raw code of a specific element.
+    """
+    if not path.exists():
+        typer.secho(f"Error: File {path} not found.", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+    processor = CaplProcessor(path)
+    code = processor.get_element_code(element_type, name)
+    
+    if code:
+        # Print raw code to stdout (important for AI pipe usage)
+        typer.echo(code, nl=False)
+    else:
+        typer.secho(f"Error: Element '{name}' of type '{element_type}' not found.", fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=1)
 
 
 def main():

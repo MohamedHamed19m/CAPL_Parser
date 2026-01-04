@@ -64,6 +64,12 @@ class CaplProcessor:
             return 0
             
         logger.info(f"Processor removing {len(to_remove)} test cases from group '{group_name}'")
+        
+        # Use the editor to remove them
+        # Note: We must remove in reverse order of line numbers to avoid index shifts
+        # But your editor.remove_elements might handle this? 
+        # If not, sort here:
+        to_remove.sort(key=lambda x: x.start_line, reverse=True)
         self.editor.remove_elements(to_remove)
         
         # Mark as dirty so next scan re-reads from editor
@@ -71,6 +77,52 @@ class CaplProcessor:
         self._elements = None 
         
         return len(to_remove)
+
+    def remove_element(self, element_type: str, name: str) -> int:
+        """
+        Removes elements matching the type and name.
+        Returns the number of elements removed.
+        """
+        # Ensure we have fresh elements (will sync if dirty)
+        elements = self.scan()
+        
+        to_remove = [
+            el for el in elements 
+            if el.__class__.__name__ == element_type and el.name == name
+        ]
+        
+        if not to_remove:
+            return 0
+            
+        logger.info(f"Processor removing {len(to_remove)} elements of type '{element_type}' with name '{name}'")
+        
+        # Use the editor to remove them
+        # Note: We must remove in reverse order of line numbers to avoid index shifts
+        # But your editor.remove_elements might handle this? 
+        # If not, sort here:
+        to_remove.sort(key=lambda x: x.start_line, reverse=True)
+        self.editor.remove_elements(to_remove)
+        
+        # Mark as dirty so next scan re-reads from editor
+        self._dirty = True
+        self._elements = None 
+        
+        return len(to_remove)
+
+    def get_element_code(self, element_type: str, name: str) -> Optional[str]:
+        """
+        Returns the raw code of the specified element as a string.
+        """
+        elements = self.scan()
+        target = next((el for el in elements if el.__class__.__name__ == element_type and el.name == name), None)
+        
+        if not target:
+            return None
+            
+        lines = self.editor.get_lines()
+        # target.start_line and target.end_line are 0-indexed inclusive
+        element_lines = lines[target.start_line : target.end_line + 1]
+        return "".join(element_lines)
 
     def save(self, output_path: Optional[Path] = None, backup: bool = True) -> None:
         """Saves changes to disk."""
