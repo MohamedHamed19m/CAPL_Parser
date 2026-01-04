@@ -41,3 +41,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - High-level `CaplProcessor` facade.
 - CLI tool with `scan` and `remove-group` commands.
 - Basic project structure and documentation.
+
+## v0.3.0 (2026-01-04)
+
+### Feat
+
+- add pre-commit hooks for commit message validation
+- add a test feature for commitizen
+
+## v0.2.5 (2026-01-04)
+
+## v0.2.4 (2026-01-04)
+
+## v0.2.2 (2026-01-04)
+
+### Fix
+
+- update CHANGELOG.md for v0.2.3 to include release.yml fixes
+
+## v0.2.3 (2026-01-04)
+
+### Feat
+
+- automate GitHub Release asset upload from dist folder
+
+### Fix
+
+- reorder build and release steps in release.yml and use manual check for release existence
+- correct gh release create command arguments order in release.yml
+- align cli command name with package name
+
+## v0.2.1 (2026-01-04)
+
+### Feat
+
+- add GitHub Actions workflow for drafting releases
+
+### Fix
+
+- update release.yml to handle tag conflicts and bash errors
+
+## v0.2.0 (2026-01-04)
+
+### Feat
+
+- implement CLI with Typer and update docs
+- **scanner**: implement stateful test group detection
+- **scanner**: implement CaplScanner with decoupled strategies
+- add CaplEditor class for CAPL file content editing
+- **core**: Implement CaplFileManager for CAPL file operations - Fix write_lines() method with automatic directory creation
+- **core**: Implement CaplFileManager for CAPL file operations
+- **logging**: add centralized logging system in common.py
+- **elements**: Add CaplInclude and CaplVariable classes
+
+### Fix
+
+- edit scan command summary feature to contains rich console
+
+### Refactor
+
+- rename core modules and implement processor pattern
+- implement display_name and simplify CLI output
