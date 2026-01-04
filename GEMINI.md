@@ -17,6 +17,38 @@ capl-tools = "capl_tools_lib.cli:main"
 
 - When Adding/Removing commands from cli.py make sure to Update README.md Commands section.
 
+### Commands
+
+#### `scan`
+Scans a CAPL file and displays detected elements.
+- **Arguments**: `path` (Path to .can file)
+- **Options**: 
+    - `--summary` / `-s`: Show counts only.
+    - `--json`: Output structured JSON (AI-Agent Ready).
+    - `--toon`: Output token-efficient TOON format (LLM Optimized).
+
+#### `get`
+Fetches the raw code of a specific element.
+- **Arguments**: 
+    - `path`: Path to .can file.
+    - `name`: Name of the element to fetch.
+- **Options**: `--type` / `-t`: Type of element (TestCase, Function, etc.).
+
+#### `insert`
+Surgically injects code using semantic anchors.
+- **Arguments**: `path` (Path to .can file)
+- **Options**:
+    - `--location` / `-l`: Anchor point (`after:<name>`, `section:<group>`, `line:<num>`).
+    - `--source` / `-s`: Path to code snippet file (omit for stdin).
+    - `--type` / `-t`: Optional type validation for the inserted element.
+
+#### `remove`
+Unified command to remove specific elements.
+- **Arguments**: `path` (Path to .can file)
+- **Options**:
+    - `--type` / `-t`: Type of element (TestCase, Function, TestGroup, etc.).
+    - `--name` / `-n`: Name of the element to remove.
+
 ---
 
 ## CaplProcessor Class
@@ -35,8 +67,15 @@ processor = CaplProcessor(Path("test.can"))
 # Scan
 elements = processor.scan()
 
-# Modify
-processor.remove_test_group("DeprecatedTests")
+# Fetch raw code
+code = processor.get_element_code("Function", "MyFunc")
+
+# Semantic Insert
+processor.insert("after:MyFunc", "void NewFunc() {}")
+
+# Remove
+processor.remove_element("TestCase", "OldTest")
+processor.remove_test_group("DeprecatedGroup")
 
 # Save
 processor.save(backup=True)

@@ -83,8 +83,8 @@ capl_tools insert path/to/your_file.can --location after:MyFunction --source sni
 # Remove a specific element by name and type
 capl_tools remove path/to/your_file.can --type TestCase --name "DeprecatedTest"
 
-# Remove a specific test group
-capl_tools remove-group path/to/your_file.can "MyTestGroup"
+# Remove an entire test group (Removes all member test cases)
+capl_tools remove path/to/your_file.can --type TestGroup --name "MyTestGroup"
 ```
 
 > **Tip:** If you don't want to install the package, you can run any command instantly using `uvx`:
@@ -95,8 +95,7 @@ capl_tools remove-group path/to/your_file.can "MyTestGroup"
 - `scan`: List all detected elements. Supports `--json` and `--toon` (Token-Oriented Object Notation) for automation and LLM efficiency.
 - `get`: Extract the raw code of a specific element (TestCase, Function, etc.).
 - `insert`: Surgically inject code using semantic anchors (`after:<name>`, `section:<group>`, `line:<num>`).
-- `remove`: Delete a specific element by type and name.
-- `remove-group`: Remove all test cases belonging to a specific test group.
+- `remove`: Unified command to delete specific elements by type and name (supports `TestCase`, `Function`, `TestGroup`, etc.).
 
 ## Library Usage
 
