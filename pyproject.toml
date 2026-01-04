@@ -36,6 +36,7 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "commitizen>=4.11.0",
     "mkdocs-material>=9.7.1",
     "mkdocs-typer2>=0.1.6",
     "mkdocstrings[python]>=1.0.0",
@@ -53,3 +54,11 @@ capl_tools = "capl_tools_lib.cli:main"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]   
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.2.5"
+tag_format = "v$version"
+version_files = [
+    "pyproject.toml:version"
+]
