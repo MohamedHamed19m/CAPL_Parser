@@ -1,5 +1,6 @@
 import typer
 import json
+from toon import encode as toon_encode
 from enum import Enum
 from pathlib import Path
 from typing import Optional
@@ -29,7 +30,8 @@ app = typer.Typer(
 def scan(
     path: Annotated[Path, typer.Argument(help="Path to the .can file")],
     summary: bool = typer.Option(False, "--summary", "-s", help="Show only a summary"),
-    json_output: bool = typer.Option(False, "--json", help="Output results in JSON format")
+    json_output: bool = typer.Option(False, "--json", help="Output results in JSON format"),
+    toon_output: bool = typer.Option(False, "--toon", help="Output results in TOON format (Token-Oriented Object Notation)")
 ):
     """
     Scan a CAPL file and list all detected elements (TestCases, Functions, etc.)
@@ -46,6 +48,12 @@ def scan(
         # Serialize elements to JSON and print
         data = [el.to_dict() for el in elements]
         typer.echo(json.dumps(data, indent=2))
+        return
+
+    if toon_output:
+        # Serialize elements to TOON and print
+        data = [el.to_dict() for el in elements]
+        typer.echo(toon_encode(data))
         return
 
     typer.echo(f"Found {len(elements)} elements in {path.name}:")

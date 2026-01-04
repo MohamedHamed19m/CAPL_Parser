@@ -71,6 +71,9 @@ capl_tools scan path/to/your_file.can
 # Scan and output in machine-readable JSON (AI-Agent Ready)
 capl_tools scan path/to/your_file.can --json
 
+# Scan and output in token-efficient TOON format (Optimized for LLMs)
+capl_tools scan path/to/your_file.can --toon
+
 # Fetch raw code of a specific element (Surgical Context)
 capl_tools get path/to/your_file.can MyFunction --type Function
 
@@ -89,7 +92,7 @@ capl_tools remove-group path/to/your_file.can "MyTestGroup"
 
 ### Available Commands
 
-- `scan`: List all detected elements. Supports `--json` for automation.
+- `scan`: List all detected elements. Supports `--json` and `--toon` (Token-Oriented Object Notation) for automation and LLM efficiency.
 - `get`: Extract the raw code of a specific element (TestCase, Function, etc.).
 - `insert`: Surgically inject code using semantic anchors (`after:<name>`, `section:<group>`, `line:<num>`).
 - `remove`: Delete a specific element by type and name.
