@@ -92,18 +92,7 @@ def remove_group(
         typer.secho(f"No test cases found in group '{group}'.", fg=typer.colors.YELLOW)
         
 
-@app.command()
-def transform(
-    path: Path, 
-    output: Annotated[Optional[Path], typer.Option(help="Output file path")] = None
-):
-    """
-    Modify CAPL code programmatically (e.g., refactoring or injecting code).
-    """
-    typer.echo(f"Transforming {path}...")
-    # TODO: Link to your editor.py logic
-    if output:
-        typer.echo(f"Saved to {output}")
+
 
 def main():
     """Entry point for the CLI."""
