@@ -38,6 +38,7 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = [
     "commitizen>=4.11.0",
+    "hypothesis>=6.149.0",
     "mkdocs-material>=9.7.1",
     "mkdocs-typer2>=0.1.6",
     "mkdocstrings[python]>=1.0.0",

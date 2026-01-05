@@ -43,7 +43,7 @@ class CaplScanningStrategy(ABC):
         return start_line_idx # Fallback if no block found
 
 class VariablesScanner(CaplScanningStrategy):
-    PATTERN = re.compile(r'^\s*variables\s*\{')
+    PATTERN = re.compile(r'^\s*variables\b')
 
     def scan(self, file_manager: CaplFileManager) -> List[CAPLElement]:
         elements = []
@@ -59,7 +59,7 @@ class VariablesScanner(CaplScanningStrategy):
         return elements
 
 class IncludesScanner(CaplScanningStrategy):
-    PATTERN = re.compile(r'^\s*includes\s*\{')
+    PATTERN = re.compile(r'^\s*includes\b')
     INCLUDE_PATTERN = re.compile(r'#include\s*[<"]([^>"]+)[>"]')
 
     def scan(self, file_manager: CaplFileManager) -> List[CAPLElement]:
@@ -84,8 +84,8 @@ class IncludesScanner(CaplScanningStrategy):
 
 class HandlerScanner(CaplScanningStrategy):
     # Regex for 'on event_type condition'
-    # e.g., 'on message 0x123', 'on timer t1', 'on key *'
-    PATTERN = re.compile(r'^\s*on\s+(\w+)\s+(.+?)\s*(?:\{|$)')
+    # e.g., 'on message 0x123', 'on timer t1', 'on key *', 'on start'
+    PATTERN = re.compile(r'^\s*on\s+(\w+)(?:\s+(.+?))?\s*(?:\{|$)')
 
     def scan(self, file_manager: CaplFileManager) -> List[CAPLElement]:
         elements = []
@@ -95,12 +95,13 @@ class HandlerScanner(CaplScanningStrategy):
             match = self.PATTERN.match(line)
             if match:
                 event_type = match.group(1)
-                condition = match.group(2).strip()
+                condition = match.group(2).strip() if match.group(2) else ""
                 
                 end_line = self.find_block_end(lines, i)
                 
+                name_suffix = f" {condition}" if condition else ""
                 elements.append(Handler(
-                    name=f"on {event_type} {condition}",
+                    name=f"on {event_type}{name_suffix}",
                     event_type=event_type,
                     condition=condition,
                     start_line=i,

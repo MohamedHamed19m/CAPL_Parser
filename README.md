@@ -16,6 +16,7 @@ A powerful command-line tool for parsing, analyzing, and manipulating CAPL (CAN 
 - **AST Operations** – Work with abstract syntax trees
 - **Validation** – Check CAPL syntax and semantics
 - **Code Generation** – Generate CAPL code from templates or specifications
+- **Property-Based Testing** – With hypothesis lib, generate random CAPL-like inputs to fuzz the parser. Great for DSLs where manual tests miss variants.
 
 ## Installation
 
