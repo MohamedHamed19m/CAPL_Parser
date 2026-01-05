@@ -124,11 +124,53 @@ class CaplProcessor:
         element_lines = lines[target.start_line : target.end_line + 1]
         return "".join(element_lines)
 
-    def insert(self, location: str, code: str, element_type: Optional[str] = None) -> int:
+    def insert(
+        self, 
+        location: str, 
+        element_type: Optional[str] = None, 
+        source: Optional[Path] = None, 
+        code_string: Optional[str] = None
+    ) -> bool:
         """
         Inserts code based on a semantic location anchor.
-        Returns the line number where it was inserted.
+        
+        Args:
+            location: Semantic anchor (e.g., "after:MyFunction", "line:42")
+            element_type: Type of element being inserted (TestCase, Function, etc.)
+            source: Path to file containing code (optional)
+            code_string: Code as string (optional)
+            
+        Returns:
+            bool: True if insertion was successful.
+            
+        Raises:
+            ValueError: If neither or both source/code_string are provided, or location invalid.
         """
+        # Validate inputs
+        if source is None and code_string is None:
+            raise ValueError("Must provide either 'source' or 'code_string'")
+        
+        if source is not None and code_string is not None:
+            raise ValueError("Cannot provide both 'source' and 'code_string'")
+        
+        # Get code content
+        code = ""
+        if source:
+            if not source.exists():
+                raise ValueError(f"Source file {source} not found.")
+            # Use file_manager or standard read? FileManager handles encoding usually.
+            # But file_manager reads the MAIN file. Here we read a snippet.
+            # Using standard read_text is fine, or better, use same encoding as FileManager (cp1252)
+            try:
+                code = source.read_text(encoding='cp1252')
+            except UnicodeDecodeError:
+                # Fallback to utf-8 if cp1252 fails, or just let it fail?
+                # Usually snippets might be utf-8. Let's try utf-8 as default for snippets since they are likely generated or separate.
+                # Actually, CAPL is cp1252. Stick to common.
+                code = source.read_text(encoding='utf-8', errors='replace')
+        else:
+            code = code_string
+
         elements = self.scan()
         target_line = -1
 
@@ -183,7 +225,7 @@ class CaplProcessor:
         self.editor.insert_lines(target_line, lines_to_insert)
         self._dirty = True
         self._elements = None
-        return target_line
+        return True
 
     def save(self, output_path: Optional[Path] = None, backup: bool = True) -> None:        
         """Saves changes to disk."""

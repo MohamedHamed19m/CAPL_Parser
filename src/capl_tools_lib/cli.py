@@ -172,38 +172,52 @@ def get(
 def insert(
     path: Annotated[Path, typer.Argument(help="Path to the .can file")],
     location: Annotated[str, typer.Option("--location", "-l", help="Location: 'after:<name>', 'section:<name>', or 'line:<num>'")],
+    type: Annotated[Optional[ElementType], typer.Option("--type", "-t", help="Type of element being inserted")] = None,
     source: Annotated[Optional[Path], typer.Option("--source", "-s", help="Path to code snippet (omit to read from stdin)")] = None,
-    element_type: Annotated[Optional[ElementType], typer.Option("--type", "-t", help="Type of element being inserted")] = None,
+    code: Annotated[Optional[str], typer.Option("--code", "-c", help="Code string to insert directly")] = None,
 ):
     """
-    Insert code into a CAPL file using semantic anchoring.
+    Insert code at specified location using semantic anchoring.
     """
     if not path.exists():
         typer.secho(f"Error: File {path} not found.", fg=typer.colors.RED)
         raise typer.Exit(code=1)
 
-    # Read code from file or stdin
-    if source:
-        if not source.exists():
-            typer.secho(f"Error: Source file {source} not found.", fg=typer.colors.RED)
-            raise typer.Exit(code=1)
-        code = source.read_text()
-    else:
-        # Read from stdin
-        typer.echo("Reading code from stdin (Press Ctrl+Z/Ctrl+D to finish)...", err=True)
+    # Validation
+    if source is None and code is None:
+        # Check if piped input is available for backward compatibility/usability
         import sys
-        code = sys.stdin.read()
-
-    if not code:
-        typer.secho("Error: No code provided to insert.", fg=typer.colors.RED)
+        if not sys.stdin.isatty():
+             code = sys.stdin.read()
+        else:
+            typer.secho("Error: Must provide either --source or --code", fg=typer.colors.RED)
+            raise typer.Exit(code=1)
+    
+    if source is not None and code is not None:
+        typer.secho("Error: Cannot provide both --source and --code", fg=typer.colors.RED)
         raise typer.Exit(code=1)
 
     processor = CaplProcessor(path)
     try:
-        line = processor.insert(location, code, element_type=element_type.value if element_type else None)
-        processor.save()
-        typer.secho(f"Successfully inserted {element_type.value if element_type else 'code'} at line {line} in {path.name}.", fg=typer.colors.GREEN)
-    except ValueError as e:
+        # If code was populated from stdin, pass it as code_string
+        # If source is present, pass it as source
+        # If code param is present, pass it as code_string
+        
+        # Note: processor.insert expects (location, element_type, source, code_string)
+        # We need to map correctly.
+        
+        success = processor.insert(
+            location=location,
+            element_type=type.value if type else None,
+            source=source,
+            code_string=code
+        )
+        
+        if success:
+            processor.save()
+            typer.secho(f"Successfully inserted {type.value if type else 'code'} in {path.name} at {location}.", fg=typer.colors.GREEN)
+            
+    except Exception as e:
         typer.secho(f"Error: {e}", fg=typer.colors.RED)
         raise typer.Exit(code=1)
 

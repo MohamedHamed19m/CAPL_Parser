@@ -93,6 +93,27 @@ capl_tools remove path/to/your_file.can --type TestCase --name "DeprecatedTest"
 
 # Remove an entire test group (Removes all member test cases)
 capl_tools remove path/to/your_file.can --type TestGroup --name "MyTestGroup"
+
+### Inserting Code
+
+# Insert from file (existing method)
+capl_tools insert path/to/your_file.can --location after:MyFunction --source snippet.can --type TestCase
+
+# Insert from string (NEW - for automation)
+capl_tools insert path/to/your_file.can \
+    --location after:MyFunction \
+    --type TestCase \
+    --code "testcase TC_New() { write('test'); }"
+
+# Insert multi-line code (use quotes)
+capl_tools insert path/to/your_file.can \
+    --location after:MyFunction \
+    --type TestCase \
+    --code "testcase TC_Complex() {
+    write('Starting test...');
+    testProcessData();
+    TestStepPass('Success', 'Completed');
+}"
 ```
 
 > **Tip:** If you don't want to install the package, you can run any command instantly using `uvx`:
