@@ -112,6 +112,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - High-level `CaplProcessor` facade.
 - CLI tool with `scan` and `remove-group` commands.
 - Basic project structure and documentation.
+## v2.3.0 (2026-01-05)
+
+### Feat
+
+- refactor insert to support direct string input and complete element-based abstraction
+
 ## v2.2.0 (2026-01-05)
 
 ### Feat
