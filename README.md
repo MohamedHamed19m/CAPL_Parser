@@ -8,6 +8,8 @@
 
 A powerful command-line tool for parsing, analyzing, and manipulating CAPL (CAN Access Programming Language) files.
 
+![CAPL-Parser Architecture](docs/CAPL_Parser.png)
+
 ## Features
 
 - **Parse CAPL Files** – Extract and analyze CAPL code structure
