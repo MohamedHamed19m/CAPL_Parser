@@ -1,7 +1,6 @@
 import pytest
-from pathlib import Path
 from capl_tools_lib.processor import CaplProcessor
-from capl_tools_lib.file_manager import CaplFileManager
+
 
 class TestCaplProcessor:
     """Tests for CaplProcessor - focusing on high-level workflows."""
@@ -19,18 +18,18 @@ class TestCaplProcessor:
             "\n",
             "testcase TestCase1()\n",
             "{\n",
-            "  InitializeTestGroup(\"GroupA\");\n",
+            '  InitializeTestGroup("GroupA");\n',
             "}\n",
             "\n",
             "testcase TestCase2()\n",
             "{\n",
-            "  InitializeTestGroup(\"GroupB\");\n",
+            '  InitializeTestGroup("GroupB");\n',
             "}\n",
             "\n",
             "testcase TestCase3()\n",
             "{\n",
-            "  InitializeTestGroup(\"GroupA\");\n",
-            "}\n"
+            '  InitializeTestGroup("GroupA");\n',
+            "}\n",
         ]
         file_path.write_text("".join(content), encoding="cp1252")
         return file_path
@@ -39,23 +38,23 @@ class TestCaplProcessor:
         """Test scanning and getting stats."""
         processor = CaplProcessor(test_can_file)
         stats = processor.get_stats()
-        
+
         assert stats["TestCase"] == 3
-        assert stats["CaplInclude"] == 1 
+        assert stats["CaplInclude"] == 1
         assert stats["CaplVariable"] == 1
 
     def test_remove_test_group(self, test_can_file):
         """Test removing a specific test group."""
         processor = CaplProcessor(test_can_file)
-        
+
         # Remove GroupA (2 test cases)
         removed_count = processor.remove_test_group("GroupA")
         assert removed_count == 2
-        
+
         # Stats should update after removal
         stats = processor.get_stats()
         assert stats["TestCase"] == 1
-        
+
         # Verify TestCase2 (GroupB) is still there
         elements = processor.scan()
         test_cases = [el for el in elements if el.__class__.__name__ == "TestCase"]
@@ -66,17 +65,17 @@ class TestCaplProcessor:
         """Test saving changes and reloading."""
         processor = CaplProcessor(test_can_file)
         processor.remove_test_group("GroupA")
-        
+
         # Save to a new file
         output_file = test_can_file.parent / "output.can"
         processor.save(output_path=output_file)
-        
+
         assert output_file.exists()
         content = output_file.read_text(encoding="cp1252")
         assert "TestCase1" not in content
         assert "TestCase3" not in content
         assert "TestCase2" in content
-        
+
         # Reload processor
         processor.reload()
         # After reload, it should have 3 test cases again (from original file)
@@ -85,19 +84,21 @@ class TestCaplProcessor:
     def test_dirty_flag_sync(self, test_can_file):
         """Test that changes in editor are synced to scanner via dirty flag."""
         processor = CaplProcessor(test_can_file)
-        
+
         # Initial scan
         assert len(processor.scan()) > 0
         assert not processor._dirty
-        
+
         # Modify via editor
-        from capl_tools_lib.elements import CAPLElement
         el = processor.scan()[0]
         processor.editor.remove_element(el)
-        processor._dirty = True # Processor sets this manually in remove_test_group
-        
+        processor._dirty = True  # Processor sets this manually in remove_test_group
+
         # Next scan should trigger sync
         elements_after = processor.scan()
-        assert len(elements_after) < len(processor._elements if processor._elements else []) + 1 
+        assert (
+            len(elements_after)
+            < len(processor._elements if processor._elements else []) + 1
+        )
         # Actually processor.scan() clears self._elements if dirty
         assert not processor._dirty

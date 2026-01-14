@@ -36,6 +36,29 @@ capl_tools insert tests/data/sample.can \
     --code "testcase TC2_MessageHandling()\n{\n    // Enhanced Logic by AI Agent\n    write('Starting Advanced Message Handling Test...\n');\n    TestStepPass('Initialization', 'Message handlers verified');\n}"
 ```
 
+### Advanced Insertion with Semantic Anchors
+
+You can also target specialized blocks like includes, variables, or event handlers.
+
+**Insert into global sections using aliases**
+```powershell
+# Use 'include' as an alias for 'includes'
+capl_tools insert test.can --location section:include --code "#include \"CommonLib.cin\""
+
+# Use 'variable' as an alias for 'variables'
+capl_tools insert test.can --location section:variable --code "int gGlobalCounter = 0;"
+```
+
+**Insert after specific Event Handlers**
+Event handlers are identified by their full signature. Use `scan` to find the exact name.
+```powershell
+# Insert after an 'on key' handler
+capl_tools insert test.can --location "after:on key 'a'" --code "void HandleA() { ... }"
+
+# Insert after an 'on timer' handler
+capl_tools insert test.can --location "after:on timer MyTimer" --code "// Timer cleanup logic"
+```
+
 ### 4. Verification
 The agent verifies the structure or specific code content to ensure the operation was successful.
 

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional, Dict, Any, Type
+from typing import List, Optional, Dict
 
 from capl_tools_lib.common import get_logger
 from capl_tools_lib.file_manager import CaplFileManager
@@ -9,24 +9,25 @@ from capl_tools_lib.elements import CAPLElement, TestCase
 
 logger = get_logger(__name__)
 
+
 class CaplProcessor:
     """
     High-level facade for processing CAPL files.
     Coordinates FileManager, Scanner, and Editor to perform complex operations.
     Implements the Facade pattern to simplify interactions with the CAPL toolchain.
     """
-    
+
     def __init__(self, file_path: Path):
         self.file_path = file_path
         self.file_manager = CaplFileManager(file_path)
         self.editor = CaplEditor(self.file_manager)
         self.scanner = CaplScanner(self.file_manager)
         self._elements: Optional[List[CAPLElement]] = None
-        self._dirty = False # Tracks if file has been modified since last scan
+        self._dirty = False  # Tracks if file has been modified since last scan
 
     def scan(self, force_refresh: bool = False) -> List[CAPLElement]:
         """
-        Scans the file for elements. 
+        Scans the file for elements.
         Automatically syncs scanner with editor changes if needed.
         """
         if self._dirty:
@@ -38,13 +39,14 @@ class CaplProcessor:
 
         if self._elements is None or force_refresh:
             self._elements = self.scanner.scan_all()
-        
+
         return self._elements
 
     def get_stats(self) -> Dict[str, int]:
         """Returns a count of each element type."""
         elements = self.scan()
         from collections import Counter
+
         return dict(Counter(el.__class__.__name__ for el in elements))
 
     def remove_test_group(self, group_name: str) -> int:
@@ -54,28 +56,31 @@ class CaplProcessor:
         """
         # Ensure we have fresh elements (will sync if dirty)
         elements = self.scan()
-        
-        to_remove = [
-            el for el in elements 
+
+        to_remove: List[CAPLElement] = [
+            el
+            for el in elements
             if isinstance(el, TestCase) and el.group_name == group_name
         ]
-        
+
         if not to_remove:
             return 0
-            
-        logger.info(f"Processor removing {len(to_remove)} test cases from group '{group_name}'")
-        
+
+        logger.info(
+            f"Processor removing {len(to_remove)} test cases from group '{group_name}'"
+        )
+
         # Use the editor to remove them
         # Note: We must remove in reverse order of line numbers to avoid index shifts
-        # But your editor.remove_elements might handle this? 
+        # But your editor.remove_elements might handle this?
         # If not, sort here:
         to_remove.sort(key=lambda x: x.start_line, reverse=True)
         self.editor.remove_elements(to_remove)
-        
+
         # Mark as dirty so next scan re-reads from editor
         self._dirty = True
-        self._elements = None 
-        
+        self._elements = None
+
         return len(to_remove)
 
     def remove_element(self, element_type: str, name: str) -> int:
@@ -85,28 +90,31 @@ class CaplProcessor:
         """
         # Ensure we have fresh elements (will sync if dirty)
         elements = self.scan()
-        
-        to_remove = [
-            el for el in elements 
+
+        to_remove: List[CAPLElement] = [
+            el
+            for el in elements
             if el.__class__.__name__ == element_type and el.name == name
         ]
-        
+
         if not to_remove:
             return 0
-            
-        logger.info(f"Processor removing {len(to_remove)} elements of type '{element_type}' with name '{name}'")
-        
+
+        logger.info(
+            f"Processor removing {len(to_remove)} elements of type '{element_type}' with name '{name}'"
+        )
+
         # Use the editor to remove them
         # Note: We must remove in reverse order of line numbers to avoid index shifts
-        # But your editor.remove_elements might handle this? 
+        # But your editor.remove_elements might handle this?
         # If not, sort here:
         to_remove.sort(key=lambda x: x.start_line, reverse=True)
         self.editor.remove_elements(to_remove)
-        
+
         # Mark as dirty so next scan re-reads from editor
         self._dirty = True
-        self._elements = None 
-        
+        self._elements = None
+
         return len(to_remove)
 
     def get_element_code(self, element_type: str, name: str) -> Optional[str]:
@@ -114,8 +122,15 @@ class CaplProcessor:
         Returns the raw code of the specified element as a string.
         """
         elements = self.scan()
-        target = next((el for el in elements if el.__class__.__name__ == element_type and el.name == name), None)
-        
+        target = next(
+            (
+                el
+                for el in elements
+                if el.__class__.__name__ == element_type and el.name == name
+            ),
+            None,
+        )
+
         if not target:
             return None
 
@@ -125,34 +140,34 @@ class CaplProcessor:
         return "".join(element_lines)
 
     def insert(
-        self, 
-        location: str, 
-        element_type: Optional[str] = None, 
-        source: Optional[Path] = None, 
-        code_string: Optional[str] = None
+        self,
+        location: str,
+        element_type: Optional[str] = None,
+        source: Optional[Path] = None,
+        code_string: Optional[str] = None,
     ) -> bool:
         """
         Inserts code based on a semantic location anchor.
-        
+
         Args:
             location: Semantic anchor (e.g., "after:MyFunction", "line:42")
             element_type: Type of element being inserted (TestCase, Function, etc.)
             source: Path to file containing code (optional)
             code_string: Code as string (optional)
-            
+
         Returns:
             bool: True if insertion was successful.
-            
+
         Raises:
             ValueError: If neither or both source/code_string are provided, or location invalid.
         """
         # Validate inputs
         if source is None and code_string is None:
             raise ValueError("Must provide either 'source' or 'code_string'")
-        
+
         if source is not None and code_string is not None:
             raise ValueError("Cannot provide both 'source' and 'code_string'")
-        
+
         # Get code content
         code = ""
         if source:
@@ -162,14 +177,16 @@ class CaplProcessor:
             # But file_manager reads the MAIN file. Here we read a snippet.
             # Using standard read_text is fine, or better, use same encoding as FileManager (cp1252)
             try:
-                code = source.read_text(encoding='cp1252')
+                code = source.read_text(encoding="cp1252")
             except UnicodeDecodeError:
                 # Fallback to utf-8 if cp1252 fails, or just let it fail?
                 # Usually snippets might be utf-8. Let's try utf-8 as default for snippets since they are likely generated or separate.
                 # Actually, CAPL is cp1252. Stick to common.
-                code = source.read_text(encoding='utf-8', errors='replace')
-        else:
+                code = source.read_text(encoding="utf-8", errors="replace")
+        elif code_string is not None:
             code = code_string
+        else:
+            code = ""
 
         elements = self.scan()
         target_line = -1
@@ -186,38 +203,64 @@ class CaplProcessor:
             target_line = int(location.split(":", 1)[1])
 
         elif location.startswith("section:"):
-            section_name = location.split(":", 1)[1]
+            section_name = location.split(":", 1)[1].strip()
             from capl_tools_lib.elements import CaplInclude, CaplVariable, TestCase
-            
-            if section_name.lower() == "includes":
-                target = next((el for el in elements if isinstance(el, CaplInclude)), None)
+
+            normalized_section = section_name.lower()
+            if normalized_section in ["includes", "include"]:
+                target = next(
+                    (el for el in elements if isinstance(el, CaplInclude)), None
+                )
                 target_line = target.end_line + 1 if target else 0
-            elif section_name.lower() == "variables":
-                target = next((el for el in elements if isinstance(el, CaplVariable)), None)
+            elif normalized_section in ["variables", "variable"]:
+                target = next(
+                    (el for el in elements if isinstance(el, CaplVariable)), None
+                )
                 target_line = target.end_line + 1 if target else 0
             else:
                 # Assume section_name is a Test Group name
-                group_elements = [el for el in elements if isinstance(el, TestCase) and el.group_name == section_name]
+                group_elements = [
+                    el
+                    for el in elements
+                    if isinstance(el, TestCase) and el.group_name == section_name
+                ]
                 if group_elements:
                     # Insert after the last test case of the group
                     target_line = group_elements[-1].end_line + 1
                 else:
-                    raise ValueError(f"Section or Group '{section_name}' not found.")
-        
+                    # Collect available groups for a better error message
+                    available_groups = sorted(
+                        list(
+                            set(
+                                el.group_name
+                                for el in elements
+                                if isinstance(el, TestCase)
+                            )
+                        )
+                    )
+                    sections = ["includes", "variables"]
+                    msg = f"Section or Group '{section_name}' not found."
+                    if available_groups or sections:
+                        msg += f" Available: {', '.join(sections + available_groups)}"
+                    raise ValueError(msg)
+
         if target_line == -1:
             raise ValueError(f"Could not resolve location: {location}")
 
         # Basic validation if element_type is provided (could be expanded)
-        if element_type == "TestCase" and "testcase" not in code.lower():
-            logger.warning("Inserting a TestCase but 'testcase' keyword not found in code.")
+        if element_type is not None:
+            if element_type == "TestCase" and "testcase" not in code.lower():
+                logger.warning(
+                    "Inserting a TestCase but 'testcase' keyword not found in code."
+                )
 
         # Ensure code ends with a newline and has proper padding
         if not code.endswith("\n"):
             code += "\n"
-        
+
         # Split into lines keeping the newlines
         lines_to_insert = code.splitlines(keepends=True)
-        
+
         # Add a leading newline for spacing if inserting in middle of file
         if target_line > 0:
             lines_to_insert.insert(0, "\n")
@@ -227,7 +270,7 @@ class CaplProcessor:
         self._elements = None
         return True
 
-    def save(self, output_path: Optional[Path] = None, backup: bool = True) -> None:        
+    def save(self, output_path: Optional[Path] = None, backup: bool = True) -> None:
         """Saves changes to disk."""
         target = output_path if output_path else self.file_manager.file_path
         lines = self.editor.get_lines()
@@ -236,6 +279,6 @@ class CaplProcessor:
     def reload(self) -> None:
         """Reloads the file from disk, discarding unsaved changes."""
         self.editor.reset()
-        self.file_manager._read_file() # Re-read from disk
+        self.file_manager._read_file()  # Re-read from disk
         self._dirty = False
         self._elements = None

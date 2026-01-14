@@ -1,5 +1,5 @@
 import typer
-from toon import encode as toon_encode
+from toon import encode as toon_encode  # type: ignore
 from enum import Enum
 from pathlib import Path
 from typing import Optional, Any
@@ -11,9 +11,10 @@ from rich.panel import Panel
 # Import your internal logic
 from capl_tools_lib.processor import CaplProcessor
 
+
 def _project_element(el: Any, include_lines: bool = False) -> dict:
     """
-    Projects the element data into a dictionary. 
+    Projects the element data into a dictionary.
     Following SRP: The CLI handles presentation filtering.
     """
     data = el.to_dict()
@@ -22,6 +23,7 @@ def _project_element(el: Any, include_lines: bool = False) -> dict:
         data.pop("start_line", None)
         data.pop("end_line", None)
     return data
+
 
 class ElementType(str, Enum):
     TestCase = "TestCase"
@@ -32,17 +34,21 @@ class ElementType(str, Enum):
     Variable = "CaplVariable"
     TestGroup = "TestGroup"
 
+
 app = typer.Typer(
     name="capl_tools",
     help="A powerful CLI for parsing and manipulating CAPL files.",
     add_completion=False,
 )
 
+
 @app.command()
 def scan(
     path: Annotated[Path, typer.Argument(help="Path to the .can file")],
     toon_output: bool = typer.Option(False, "--toon", help="Output structure in TOON"),
-    full: bool = typer.Option(False, "--full", help="Include physical line numbers in the output")
+    full: bool = typer.Option(
+        False, "--full", help="Include physical line numbers in the output"
+    ),
 ):
     """
     List the logical structure of a CAPL file (Names, Signatures, and Types).
@@ -75,12 +81,20 @@ def scan(
         table.add_row(*row)
 
     console.print(table)
-    console.print(f"\n[dim]Found {len(elements)} elements. Use 'stats' for a high-level summary.[/dim]")
+    console.print(
+        f"\n[dim]Found {len(elements)} elements. Use 'stats' for a high-level summary.[/dim]"
+    )
+
 
 @app.command()
 def stats(
     path: Annotated[Path, typer.Argument(help="Path to the .can file")],
-    machine: bool = typer.Option(False, "--machine", "-m", help="Single-line output (e.g., TestCase:15|Function:3)")
+    machine: bool = typer.Option(
+        False,
+        "--machine",
+        "-m",
+        help="Single-line output (e.g., TestCase:15|Function:3)",
+    ),
 ):
     """
     Get a highly compressed inventory of the CAPL file content.
@@ -91,8 +105,9 @@ def stats(
 
     processor = CaplProcessor(path)
     elements = processor.scan()
-    
+
     from collections import Counter
+
     counts = Counter(el.__class__.__name__ for el in elements)
 
     if machine:
@@ -110,18 +125,25 @@ def stats(
     for type_name, count in sorted(counts.items()):
         summary_table.add_row(type_name, str(count))
 
-    console.print(Panel(
-        summary_table, 
-        title=f"Inventory: {path.name}", 
-        expand=False, 
-        border_style="cyan"
-    ))
+    console.print(
+        Panel(
+            summary_table,
+            title=f"Inventory: {path.name}",
+            expand=False,
+            border_style="cyan",
+        )
+    )
+
 
 @app.command()
 def remove(
     path: Annotated[Path, typer.Argument(help="Path to the .can file")],
-    element_type: Annotated[ElementType, typer.Option("--type", "-t", help="Type of element to remove")],
-    name: Annotated[str, typer.Option("--name", "-n", help="Name of the element to remove")]
+    element_type: Annotated[
+        ElementType, typer.Option("--type", "-t", help="Type of element to remove")
+    ],
+    name: Annotated[
+        str, typer.Option("--name", "-n", help="Name of the element to remove")
+    ],
 ):
     """
     Remove a specific element by its type and name.
@@ -131,24 +153,35 @@ def remove(
         raise typer.Exit(code=1)
 
     processor = CaplProcessor(path)
-    
+
     if element_type == ElementType.TestGroup:
         count = processor.remove_test_group(name)
     else:
         count = processor.remove_element(element_type.value, name)
-    
+
     if count > 0:
         processor.save()
-        typer.secho(f"Successfully removed {count} elements of type '{element_type.value}' named '{name}' in {path.name}.", fg=typer.colors.GREEN)
+        typer.secho(
+            f"Successfully removed {count} elements of type '{element_type.value}' named '{name}' in {path.name}.",
+            fg=typer.colors.GREEN,
+        )
     else:
-        typer.secho(f"No elements found matching type '{element_type.value}' and name '{name}'.", fg=typer.colors.YELLOW)
+        typer.secho(
+            f"No elements found matching type '{element_type.value}' and name '{name}'.",
+            fg=typer.colors.YELLOW,
+        )
 
 
 @app.command()
 def get(
     path: Annotated[Path, typer.Argument(help="Path to the .can file")],
     name: Annotated[str, typer.Argument(help="Name of the element to fetch")],
-    element_type: Annotated[str, typer.Option("--type", "-t", help="Type of element (e.g. TestCase, Function, Handler)")]
+    element_type: Annotated[
+        str,
+        typer.Option(
+            "--type", "-t", help="Type of element (e.g. TestCase, Function, Handler)"
+        ),
+    ],
 ):
     """
     Fetch the raw code of a specific element.
@@ -159,22 +192,44 @@ def get(
 
     processor = CaplProcessor(path)
     code = processor.get_element_code(element_type, name)
-    
+
     if code:
         # Print raw code to stdout (important for AI pipe usage)
         typer.echo(code, nl=False)
     else:
-        typer.secho(f"Error: Element '{name}' of type '{element_type}' not found.", fg=typer.colors.RED, err=True)
+        typer.secho(
+            f"Error: Element '{name}' of type '{element_type}' not found.",
+            fg=typer.colors.RED,
+            err=True,
+        )
         raise typer.Exit(code=1)
 
 
 @app.command()
 def insert(
     path: Annotated[Path, typer.Argument(help="Path to the .can file")],
-    location: Annotated[str, typer.Option("--location", "-l", help="Location: 'after:<name>', 'section:<name>', or 'line:<num>'")],
-    type: Annotated[Optional[ElementType], typer.Option("--type", "-t", help="Type of element being inserted")] = None,
-    source: Annotated[Optional[Path], typer.Option("--source", "-s", help="Path to code snippet (omit to read from stdin)")] = None,
-    code: Annotated[Optional[str], typer.Option("--code", "-c", help="Code string to insert directly")] = None,
+    location: Annotated[
+        str,
+        typer.Option(
+            "--location",
+            "-l",
+            help="Location: 'after:<name>', 'section:<name>', or 'line:<num>'",
+        ),
+    ],
+    type: Annotated[
+        Optional[ElementType],
+        typer.Option("--type", "-t", help="Type of element being inserted"),
+    ] = None,
+    source: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--source", "-s", help="Path to code snippet (omit to read from stdin)"
+        ),
+    ] = None,
+    code: Annotated[
+        Optional[str],
+        typer.Option("--code", "-c", help="Code string to insert directly"),
+    ] = None,
 ):
     """
     Insert code at specified location using semantic anchoring.
@@ -187,14 +242,19 @@ def insert(
     if source is None and code is None:
         # Check if piped input is available for backward compatibility/usability
         import sys
+
         if not sys.stdin.isatty():
-             code = sys.stdin.read()
+            code = sys.stdin.read()
         else:
-            typer.secho("Error: Must provide either --source or --code", fg=typer.colors.RED)
+            typer.secho(
+                "Error: Must provide either --source or --code", fg=typer.colors.RED
+            )
             raise typer.Exit(code=1)
-    
+
     if source is not None and code is not None:
-        typer.secho("Error: Cannot provide both --source and --code", fg=typer.colors.RED)
+        typer.secho(
+            "Error: Cannot provide both --source and --code", fg=typer.colors.RED
+        )
         raise typer.Exit(code=1)
 
     processor = CaplProcessor(path)
@@ -202,21 +262,24 @@ def insert(
         # If code was populated from stdin, pass it as code_string
         # If source is present, pass it as source
         # If code param is present, pass it as code_string
-        
+
         # Note: processor.insert expects (location, element_type, source, code_string)
         # We need to map correctly.
-        
+
         success = processor.insert(
             location=location,
             element_type=type.value if type else None,
             source=source,
-            code_string=code
+            code_string=code,
         )
-        
+
         if success:
             processor.save()
-            typer.secho(f"Successfully inserted {type.value if type else 'code'} in {path.name} at {location}.", fg=typer.colors.GREEN)
-            
+            typer.secho(
+                f"Successfully inserted {type.value if type else 'code'} in {path.name} at {location}.",
+                fg=typer.colors.GREEN,
+            )
+
     except Exception as e:
         typer.secho(f"Error: {e}", fg=typer.colors.RED)
         raise typer.Exit(code=1)
@@ -225,6 +288,7 @@ def insert(
 def main():
     """Entry point for the CLI."""
     app()
+
 
 if __name__ == "__main__":
     main()

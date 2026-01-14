@@ -1,6 +1,3 @@
-import sys
-import os
-
 import logging
 from capl_tools_lib.common import get_logger, MODULE_CONFIG
 

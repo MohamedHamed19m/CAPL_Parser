@@ -2,6 +2,7 @@ import pytest
 from pathlib import Path
 from capl_tools_lib.file_manager import CaplFileManager
 
+
 class TestCaplFileManager:
     """Tests for CaplFileManager - focusing on file I/O and comment stripping."""
 
@@ -15,7 +16,7 @@ class TestCaplFileManager:
             "  int x = 5; // inline comment\n",
             "}\n",
             "/* block\n",
-            "   comment */\n"
+            "   comment */\n",
         ]
         file_path.write_text("".join(content), encoding="cp1252")
         return file_path
@@ -50,10 +51,10 @@ class TestCaplFileManager:
         """Test writing lines to a new file."""
         output_path = tmp_path / "output" / "new.can"
         fm = CaplFileManager(test_file)
-        
+
         lines = ["line1\n", "line2\n"]
         fm.write_lines(output_path, lines)
-        
+
         assert output_path.exists()
         assert output_path.read_text(encoding="cp1252") == "line1\nline2\n"
 
@@ -70,7 +71,7 @@ class TestCaplFileManager:
         fm = CaplFileManager(test_file)
         new_lines = ["new content\n"]
         fm.save_file(test_file, new_lines, backup=True)
-        
+
         bak_file = test_file.with_suffix(".can.bak")
         assert bak_file.exists()
         assert "variables {" in bak_file.read_text(encoding="cp1252")
@@ -80,7 +81,7 @@ class TestCaplFileManager:
         """Test stripping // comments."""
         fm = CaplFileManager(test_file)
         stripped = fm.strip_comments()
-        
+
         assert "variables {" in stripped
         assert "int x = 5;" in stripped[1]
         assert "// Header comment" not in "".join(stripped)

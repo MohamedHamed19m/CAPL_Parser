@@ -2,6 +2,7 @@ import pytest
 from capl_tools_lib.editor import CaplEditor
 from capl_tools_lib.elements import CAPLElement
 
+
 class TestCaplEditor:
     """Tests for CaplEditor - focused on in-memory line manipulation."""
 
@@ -20,8 +21,8 @@ class TestCaplEditor:
             "\n",
             "testcase MyTestCase()\n",
             "{\n",
-            "  write(\"Hello\");\n",
-            "}\n"
+            '  write("Hello");\n',
+            "}\n",
         ]
 
     @pytest.fixture
@@ -36,7 +37,9 @@ class TestCaplEditor:
 
     def test_init_error(self):
         """Verify editor raises ValueError if no source is provided."""
-        with pytest.raises(ValueError, match="Either file_mngr or lines must be provided"):
+        with pytest.raises(
+            ValueError, match="Either file_mngr or lines must be provided"
+        ):
             CaplEditor()
 
     def test_delete_lines(self, editor):
@@ -93,22 +96,24 @@ class TestCaplEditor:
     def test_reset(self, initial_lines):
         """Test resetting the editor to the original state."""
         from unittest.mock import MagicMock
+
         mock_fm = MagicMock()
         mock_fm.lines = initial_lines
-        
+
         editor = CaplEditor(file_mngr=mock_fm)
         editor.delete_lines(0, 5)
         assert len(editor.get_lines()) < len(initial_lines)
-        
+
         editor.reset()
         assert editor.get_lines() == initial_lines
 
     def test_init_with_file_mngr(self, initial_lines):
         """Verify editor initializes correctly with a file manager."""
         from unittest.mock import MagicMock
+
         mock_fm = MagicMock()
         mock_fm.lines = initial_lines
-        
+
         editor = CaplEditor(file_mngr=mock_fm)
         assert editor.get_lines() == initial_lines
         assert editor.file_mngr == mock_fm

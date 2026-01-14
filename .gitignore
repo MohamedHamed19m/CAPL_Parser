@@ -14,12 +14,17 @@ build/
 .pytest_cache/
 .coverage
 htmlcov/
+.hypothesis/
 
 # --- CAPL/Vector Specific (Optional but recommended) ---
 # If you run tests that generate Vector-specific outputs
 *.can.log
 *.asc
 *.blf
+*.bak
+
+# --- Tools/AI Specific ---
+.aic/
 
 # --- System/IDE ---
 .vscode/
